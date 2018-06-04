@@ -1,0 +1,15 @@
+- [x] Break up workspaces file
+- [~] Optimize queries
+- [] Add Preview to card
+- [ ] Organize db file
+- [ ] Add spec for notes
+- [ ] Add note#show page
+- [ ] Refactor state/ui to allow for undoing/going back
+   - [] Separate events into db events and ui events
+   - [ ] Add support for browser history
+- [ ] Generalize styles
+   - [ ] Add support for custom colors (night mode)
+- [ ] Write tests
+- [ ] Editting a row (card) in full screen, brings up the template + data and is editable. The fields are separated by dashes. Do we even need explicit fields at this point? Just use the dashes..
+- [] Settings page
+- [] Transfer one card's review history to another card.

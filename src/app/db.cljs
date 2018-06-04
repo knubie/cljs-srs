@@ -9,24 +9,30 @@
 (s/def ::id      keyword?)
 (s/def ::deck-id keyword?)
 (s/def ::name    string?)
-(s/def ::display string?)
+(s/def ::template string?)
 (s/def ::reviews vector?)
 (s/def ::due     inst?)
 (s/def ::type (s/or :text  (= 'text)
                     :image (= 'image)
                     :audio (= 'audio)))
 
-(s/def ::deck   (s/keys :req-un [::id ::name ::display]))
+(s/def ::deck   (s/keys :req-un [::id ::name ::template]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 (s/def ::fields (s/map-of ::id ::field))
 (s/def ::card   (s/keys :req-un [::id ::deck-id ::reviews ::fields]
                         :opt-un [::due]))
 
+; NOTE: If automatically adjusting the interval modifier, we should keep track
+; of which reviews have which interval modifier, so that we have enough sample
+; data to adjust the interval modifier again.
+;
+; NOTE: A lapse should reduce the ease by 20 percentage points.
+
 ; decks
 ;   :parent-deck-id
 ;   :name String
 ;   :fields {id {:name String :type Type}}
-;   :card-display String
+;   :card-template String
 ;
 ; cards
 ;   :deck-id DeckID
@@ -42,17 +48,20 @@
 (defonce state
   (r/atom
     {:actions []
-     :ui {:workspace [:home]}
-     :db {:decks  {}
+     :ui {:workspace [:home]
+          :modal nil}
+     :db {:notes  {} ;; TODO: Write spec
+          :decks  {}
           :fields {}
           :cards  {}}}))
 
-(defonce ui-workspace   (r/cursor state [:ui :workspace]))
+(defonce ui-workspace (r/cursor state [:ui :workspace]))
+(defonce all-decks    (r/cursor state [:db :decks]))
+(defonce all-notes    (r/cursor state [:db :notes]))
+(defonce all-cards    (r/cursor state [:db :notes]))
+(defonce all-fields   (r/cursor state [:db :fields]))
+(defonce modal        (r/cursor state [:ui :modal]))
 
-;; -- Util -----------------------------------------------------------------
-
-;; TODO: Move this somewhere else.
-(defn today [] (cljs-time/at-midnight (cljs-time/now)))
 
 ;; -- Seed Data ------------------------------------------------------------
 
@@ -61,11 +70,54 @@
     (swap! state assoc-in [:db model id] (assoc attrs :id id))
     id))
 
+;(def deck-id (-> random-uuid str keyword))
+;(def f1-id (-> random-uuid str keyword))
+;(def f2-id (-> random-uuid str keyword))
+;(def c1-id (-> random-uuid str keyword))
+;(def c2-id (-> random-uuid str keyword))
+
+;(def seed-data
+  ;{:name    "日本語"
+
+   ;:template "#{{Question}}\n\n---\n\n#{{Answer}}"
+
+   ;:fields  {f1-id {:name "Question" :type 'text}
+             ;f2-id {:name "Answer"   :type 'text}}
+
+   ;:cards   {c1-id {:due (today)
+                    ;:reviews []
+                    ;:fields {f1-id "こんにちは"
+                             ;f2-id "Hello"}}
+             ;c2-id {:reviews []
+                    ;:fields {f1-id "おはようございます"
+                             ;f2-id "Good morning"}}}})
+
+;(defonce init-db (do
+  ;(swap! state assoc-in [:db :decks deck-id]
+    ;(-> seed-data (assoc :id deck-id)))))
+
 (defonce seed-data
-  (let [my-deck
+  (let [my-note
+          (add-record! :notes
+            {:name "日本語の文法"})
+
+        my-deck
           (add-record! :decks
             {:name   "日本語"
-             :display "#{{Question}}\n\n---\n\n#{{Answer}}"})
+             :template "#{{Question}}\n\n---\n\n#{{Answer}}"})
+
+        other-deck
+          (add-record! :decks
+            {:name   "Sample Deck"
+             :template "#{{Front}}\n\n---\n\n#{{Back}}"})
+
+        _
+          (add-record! :fields
+            {:deck-id other-deck :name "Front" :type "text"})
+
+        _
+          (add-record! :fields
+            {:deck-id other-deck :name "Back" :type "text"})
 
         question-field
           (add-record! :fields
@@ -78,7 +130,7 @@
     (do
       (add-record! :cards
         {:deck-id my-deck
-         :due     (today)
+         :due     (cljs-time/today)
          :reviews []
          :fields  {question-field "こんにちは"
                    answer-field   "Hello"}})
@@ -97,6 +149,8 @@
 ;; By convention, the `find-one` function return a single result, whereas the
 ;; `where` methods filter the hash.
 
+;; TODO: Test me!
+;; TODO: Accept hash of key matcher pairs
 (defn where [key matcher collection]
   (->> collection
        (filter #(-> % second key (= matcher))) ;; `second` is used to grab

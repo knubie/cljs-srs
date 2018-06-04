@@ -1,7 +1,7 @@
 (defproject app "0.1.0"
   :dependencies [[org.clojure/clojure        "1.9.0"]
                  [org.clojure/clojurescript  "1.10.238"]
-                 [reagent  "0.8.0-rc1"]
+                 [reagent  "0.8.1"]
                  [cljstache "2.0.1"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [cljsjs/antd "3.5.0-0"]]
