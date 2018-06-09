@@ -15,6 +15,12 @@
 (def all-fields (r/cursor state [:db :fields]))
 (def all-cards (r/cursor state [:db :cards]))
 
+(defn note [note-id]
+  (let [note @(r/cursor state [:db :notes note-id])]
+    [:div {:dangerouslySetInnerHTML {:__html
+      (-> note :content js/marked)}}]))
+
+
 (defn study [deck-id]
   (r/with-let [current-side (r/atom 1)
                last-side? (r/atom false)
@@ -60,12 +66,22 @@
     [:<>
      [:div {:style {:margin-bottom "0.5em"}}
       
-      [:div {:style styles/h1} (deck :name)]]
+      [:div {:content-editable true
+             :on-blur #(dispatch [:edit-deck-name {
+                                  :deck-id deck-id
+                                  :name    (-> % .-target .-textContent)}])
+             :style (conj styles/h1
+                          {:outline 0
+                           :-webkit-user-modify 'read-write-plaintext-only})}
+       (deck :name)]]
+
      [ui/button "Study" #(dispatch [:study deck-id])]
       [data-table deck-fields cards deck-id]]))
 
+
 (defn home []
   [:div "Let's learn something!"])
+
 
 (defn workspace []
   [:div {:style styles/workspace}
@@ -73,5 +89,6 @@
     (case (first @ui-workspace)
       :home  [home]
       ;; TODO: it's not clear what nth is doing here.
+      :note  [note  (nth @ui-workspace 1)]
       :deck  [deck  (nth @ui-workspace 1)]
       :study [study (nth @ui-workspace 1)])]])

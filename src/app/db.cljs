@@ -1,7 +1,10 @@
 (ns app.db
   (:require [cljs.spec.alpha :as s]
+            [cljs.reader     :as edn]
+            [app.sample-note :refer [sample-note]]
             [reagent.core    :as r]
             [cljs-time.core  :as cljs-time]
+            [cljs-time.instant] ;; Required to serialize data objects as EDN.
             [cljs-time.extend]))
 
 ;; -- Schema ---------------------------------------------------------------
@@ -17,10 +20,24 @@
                     :audio (= 'audio)))
 
 (s/def ::deck   (s/keys :req-un [::id ::name ::template]))
+(s/def ::note   (s/keys :req-un [::id ::name]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 (s/def ::fields (s/map-of ::id ::field))
 (s/def ::card   (s/keys :req-un [::id ::deck-id ::reviews ::fields]
                         :opt-un [::due]))
+
+(s/def ::review (s/keys :req-un [::date ::remembered?]))
+
+;1/1 {:due 1/1} -> {:due 1/2} + {:date 1/1 :remembered? true} | 1 day
+;1/2 {:due 1/2} -> {:due 1/4} + {:date 1/2 :remembered? true} | 2 days
+;1/4 {:due 1/4} -> {:due 1/8} + {:date 1/4 :remembered? true} | 4 days
+
+;1/8 {:due 1/4} -> {:due 1/12} + {:date 1/8 :remembered? true} | 4 days
+;1/12 {:due 1/12} -> {:due 1/20} + {:date 1/12 :remembered? true} | 8 days
+
+;due-date - review-date = interval
+; If lapsed, use the previous interval.
+
 
 ; NOTE: If automatically adjusting the interval modifier, we should keep track
 ; of which reviews have which interval modifier, so that we have enough sample
@@ -49,7 +66,8 @@
   (r/atom
     {:actions []
      :ui {:workspace [:home]
-          :modal nil}
+          :modal  {:card-id nil
+                   :open? false}}
      :db {:notes  {} ;; TODO: Write spec
           :decks  {}
           :fields {}
@@ -96,10 +114,11 @@
   ;(swap! state assoc-in [:db :decks deck-id]
     ;(-> seed-data (assoc :id deck-id)))))
 
-(defonce seed-data
+(defn seed-data []
   (let [my-note
           (add-record! :notes
-            {:name "日本語の文法"})
+            {:name "日本語の文法"
+             :content sample-note})
 
         my-deck
           (add-record! :decks
@@ -170,11 +189,18 @@
 ;; event. In the future we might selectively store only certain parts of the
 ;; state that gets stored. For instance, we may decide to not store the UI state.
 
-;(def local-storage-key "cljs-app")
+(def local-storage-key "cljs-app")
 
-;(defn state->local-storage []
-  ;(.setItem js/localStorage local-storage-key (prn-str @state)))
+(defn state->local-storage []
+  (.setItem js/localStorage local-storage-key (prn-str @state)))
 
-;(defn local-storage->state []
-  ;(reset! @state (some->> (.getItem js/localStorage local-storage-key)
-                          ;edn/read-string)))
+(defn local-storage->state []
+  (reset! state (some->> (.getItem js/localStorage local-storage-key)
+                          edn/read-string)))
+
+(defn initialize-db []
+  (let [local-storage-state (some->> (.getItem js/localStorage local-storage-key)
+                                     edn/read-string)]
+    (if (nil? local-storage-state)
+      (seed-data)
+      (local-storage->state))))

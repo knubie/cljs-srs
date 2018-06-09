@@ -15,7 +15,7 @@
                  :color weak-color}}
  
    ;; Fields
-   [:div {:style {:display 'inline-flex}}
+   
     (for [field fields]
       [:div {:key (field :id)
              :content-editable true
@@ -27,11 +27,11 @@
                      :-webkit-user-modify 'read-write-plaintext-only
                      :outline      0
                      :padding      "0 8px"
-                     :flex-shrink  0
+                     ;:flex-shrink  0
                      :height       32
                      :width        (/ (- 900 32) (count fields))
                      :border-right border-weak}}
-       (field :name)])]
+       (field :name)])
  
    ;; Add Field
    [:div {:on-click #(dispatch [:add-field {:deck-id deck-id
@@ -48,6 +48,7 @@
   ;(r/with-let [hover? (r/atom false)]
     ;[:div {:on-mouse-enter #(reset! hover? true)
            ;:on-mouse-leave #(reset! hover? false)}
+
 
 (defn table-row [record fields]
   (r/with-let [hover? (r/atom false)]
@@ -90,6 +91,7 @@
    (for [record records]
      [table-row record fields])])
 
+
 (defn table-new-record [deck-id fields]
   [:div {:on-click #(dispatch [:add-empty-card deck-id fields])
          :style {:display 'flex
@@ -102,6 +104,7 @@
                  :cursor 'pointer}}
    [icons/plus 18 18 4] "Add a Card"]
   )
+
 
 (defn data-table [fields records deck-id]
   [:div

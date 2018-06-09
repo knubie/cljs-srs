@@ -1,5 +1,5 @@
 (ns app.events
-  (:require [app.db :refer [state ui-workspace add-record!]]
+  (:require [app.db :refer [state ui-workspace add-record! state->local-storage]]
             [app.models.card :as c]))
 
 ;; -- Event Handlers -------------------------------------------------------
@@ -17,22 +17,22 @@
   (swap! state assoc-in [:ui :workspace] [:deck deck-id]))
 
 
+(defmethod handle :select-note
+  [[_ note-id]]
+
+  (swap! state assoc-in [:ui :workspace] [:note note-id]))
+
+
 (defmethod handle :set-modal
   [[_ card-id]]
 
-  (swap! state assoc-in [:ui :modal] card-id))
+  (swap! state assoc-in [:ui :modal] {:card-id card-id :open? true}))
 
 
-(defmethod handle :reset-modal
+(defmethod handle :close-modal
   [[_]]
 
-  (swap! state assoc-in [:ui :modal] nil))
-
-(defmethod handle :select-note-type
-  [[_ note-type-id]]
-
-  (swap! state assoc-in [:ui :workspace] [:note-type note-type-id]))
-
+  (swap! state assoc-in [:ui :modal :open?] false))
 
 (defmethod handle :study
   [[_ deck-id]]
@@ -59,12 +59,30 @@
 
   (add-record! :cards card))
 
+
+(defmethod handle :add-deck
+  [[_ deck]]
+
+  (let [deck-id (add-record! :decks deck)]
+    (add-record! :fields
+      {:deck-id deck-id :name "Question" :type "text"})
+    (add-record! :fields
+      {:deck-id deck-id :name "Answer" :type "text"})
+    (handle [:select-deck deck-id])))
+  
+
 (defmethod handle :add-empty-card
   [[_ deck-id fields]]
 
   (add-record! :cards {:deck-id deck-id
                        :reviews []
                        :fields (into {} (for [field fields] [(field :id) ""]))}))
+
+(defmethod handle :edit-deck-name
+  [[_ {:keys [deck-id name]}]]
+
+  (swap! state assoc-in [:db :decks deck-id :name] name))
+
 
 (defmethod handle :edit-card
   [[_ card]]
@@ -96,7 +114,9 @@
 ;; and post- tasks before delegating to the corresponding event handler.
 
 (defn validate-state [] (js/console.log "Validating state."))
-(defn save-state [] (js/console.log "Saving state."))
+(defn save-state []
+  (js/console.log "Saving state.")
+  (state->local-storage))
 
 ;; TODO: Create UI actions and DB actions.
 ;; DB Actions persist to local storage, whereas UI actions do not.

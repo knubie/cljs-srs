@@ -2,3 +2,4 @@ out
 .cpcache
 electron/node_modules
 resources
+.cljs_rhino_repl

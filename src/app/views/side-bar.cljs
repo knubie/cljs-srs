@@ -5,17 +5,25 @@
             [app.views.icons :as icons]
             [app.styles      :as styles]))
 
-(defn side-bar-section-item [{:keys [name icon on-click]}]
+(defn side-bar-section-item [{:keys [name icon on-click on-edit]}]
   [:div {:on-click on-click
-                   :style {:display 'flex
-                           :align-items 'center
-                           :min-height 27
-                           :font-size 14
-                           :padding "2px 14px"
-                           :width "100%"}}
+         :style {:display 'flex
+                 :align-items 'center
+                 :min-height 27
+                 :font-size 14
+                 :padding "2px 14px"
+                 :width "100%"}}
              [:div {:style {:color "rgba(0,0,0,0.2)"
                             :margin-right 4}} [icon 18 18]]
-             [:div {:style {:white-space 'nowrap
+             [:div {:content-editable true
+                    :on-blur on-edit
+                    :on-key-down #(case (.-which %)
+                                    13 (-> % .-target .blur)
+                                    27 (-> % .-target .blur)
+                                    nil)
+                    :style {:-webkit-user-modify 'read-write-plaintext-only
+                            :outline 0
+                            :white-space 'nowrap
                             :overflow 'hidden 
                             :text-overflow 'ellipsis}}
               name]])
@@ -31,6 +39,14 @@
     [:span {:style styles/side-bar-header} title]]
    children])
 
+(def new-deck
+  {:name     "New Deck"
+   :template "#{{Question}}\n\n---\n\n#{{Answer}}"})
+
+(def new-note
+  {:name    "New Note"
+   :content "Edit me!"})
+
 (defn side-bar []
   [:div {:style styles/side-bar}
    [:div
@@ -38,11 +54,20 @@
      (for [[id note] @all-notes] ^{:key (note :id)}
        [side-bar-section-item {:name (note :name)
                                :icon icons/doc-text
-                               :on-click #(js/console.log "select-note")}])]
+                               :on-click #(dispatch [:select-note (note :id)])}])
+     [side-bar-section-item {:name "Add Note"
+                             :icon icons/plus
+                             :on-click #(dispatch [:add-note new-note])}]]
 
     [side-bar-section {:title "Decks"
                        :icon icons/book}
      (for [[id deck] @all-decks] ^{:key (deck :id)}
        [side-bar-section-item {:name (deck :name)
                                :icon icons/book
-                               :on-click #(dispatch [:select-deck (deck :id)])}])]]])
+                               :on-edit #(dispatch [:edit-deck-name {
+                                 :deck-id id
+                                 :name    (-> % .-target .-textContent)}])
+                               :on-click #(dispatch [:select-deck (deck :id)])}])
+     [side-bar-section-item {:name "Add Deck"
+                             :icon icons/plus
+                             :on-click #(dispatch [:add-deck new-deck])}]]]])

@@ -27,6 +27,7 @@
   :color "#222222"
   :flexGrow 1
   :text-align "center"
+  :overflow 'auto
 })
 
 (def workspace-content {
@@ -34,6 +35,7 @@
   :margin "0 auto"
   :margin-top "5em"
   :text-align "left"
+  :padding "0px 96px 30vh"
 })
 
 (def table-td {
