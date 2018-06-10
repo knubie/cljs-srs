@@ -2,6 +2,7 @@
   (:require [clojure.string :as str] 
             [reagent.core   :as r]
             [cljs-time.core :refer [today]]
+            [app.views.util.keyboard :as kbd]
             [app.views.data-table :refer [data-table]]
             [app.views.ui    :as ui]
             [app.views.card  :refer [render-card]]
@@ -26,10 +27,11 @@
                last-side? (r/atom false)
                next-side #(swap! current-side inc)
                remember #(js/console.log "Remember.")
-               handler #(case (.-which %) 32 (if @last-side?
-                                               (remember)
-                                               (next-side))
-                                          nil)
+               handler #(case (.-which %)
+                        kbd/space (if @last-side?
+                                    (remember)
+                                    (next-side))
+                        nil)
                _ (js/document.addEventListener "keydown" handler)]
 
     (let [due-card (->> @all-cards (where :deck-id deck-id)

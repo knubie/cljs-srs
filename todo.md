@@ -3,9 +3,8 @@
 - [~] Optimize queries
 - [~] Add spec for notes
 - [ ] Make generic "editable" component
-- [ ] Put magic keyboard numbers in their own module.
-   - side-bar.cljs workspace.cljs
 - [ ] Add spec for review
+- [x] Put magic keyboard numbers in their own module.
 - [ ] Organize db file
 - [~] Add note#show page
    - [ ] Add ability to edit note

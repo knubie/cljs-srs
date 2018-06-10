@@ -3,6 +3,7 @@
             [app.db          :refer [state all-decks all-notes]]
             [app.events      :refer [dispatch]]
             [app.views.icons :as icons]
+            [app.views.util.keyboard :as kbd]
             [app.styles      :as styles]))
 
 (defn side-bar-section-item [{:keys [name icon on-click on-edit]}]
@@ -18,8 +19,8 @@
              [:div {:content-editable true
                     :on-blur on-edit
                     :on-key-down #(case (.-which %)
-                                    13 (-> % .-target .blur)
-                                    27 (-> % .-target .blur)
+                                    kbd/enter  (-> % .-target .blur)
+                                    kbd/escape (-> % .-target .blur)
                                     nil)
                     :style {:-webkit-user-modify 'read-write-plaintext-only
                             :outline 0
