@@ -1,5 +1,6 @@
 (defproject app "0.1.0"
   :dependencies [[org.clojure/clojure        "1.9.0"]
+                 [org.clojure/test.check     "0.9.0"]
                  [org.clojure/clojurescript  "1.10.238"]
                  [reagent  "0.8.1"]
                  [cljstache "2.0.1"]
@@ -13,7 +14,8 @@
 
   :profiles {:dev {:cljsbuild
                     {:builds
-                      {:client {:figwheel {:on-jsload "app.core/run"}
+                      {:client {:source-paths ["test"]
+                                :figwheel {:on-jsload "app.core/run"}
                                 :compiler {:main "app.core"
                                            :asset-path "js"
                                            :optimizations :none
@@ -24,7 +26,7 @@
                       {:client {:compiler {:optimizations :advanced
                                            :elide-asserts true
                                            :pretty-print false}}}}}}
-  :figwheel {:repl false}
+  :figwheel {:repl true}
 
   :clean-targets ^{:protect false} ["resources/public/js"]
 

@@ -12,7 +12,8 @@
    - [] Look into draft.js
 - [ ] Generalize styles
    - [ ] Add support for custom colors (night mode)
-- [ ] Write tests
+- [~] Start writing tests
+   - [x] Add tests for srs system
 - [ ] Editting a row (card) in full screen, brings up the template + data and is editable. The fields are separated by dashes. Do we even need explicit fields at this point? Just use the dashes..
 - [ ] Get resource/public/ shit into git
 - [ ] Remove data transformations from views
@@ -22,6 +23,7 @@
    - [x] Loads seed data if no localstorage is found.
    - [ ] Improve seed data ( Right now it's all japanese shit. )
 - [] SRS System working
+   - [x] Remember and forget cards
 - [] Import from csv
    - [] Import from Anki
 - [] Images on cards
