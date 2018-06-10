@@ -1,5 +1,7 @@
 (ns app.events
-  (:require [app.db :refer [state ui-workspace add-record! state->local-storage]]
+  (:require [cljs.spec.alpha :as s]
+            [app.db :refer [state ui-workspace
+                            add-record! state->local-storage]]
             [app.models.card :as c]))
 
 ;; -- Event Handlers -------------------------------------------------------
@@ -113,7 +115,14 @@
 ;; The `dispatch` function recieves incoming actions and performs pre-
 ;; and post- tasks before delegating to the corresponding event handler.
 
-(defn validate-state [] (js/console.log "Validating state."))
+
+(defn validate-state []
+  (when-not (s/valid? :app.db/db (-> @state :db))
+    (throw
+      (ex-info
+        (str "spec check failed: "
+             (s/explain-str :app.db/db (-> @state :db))) {}))))
+
 (defn save-state []
   (js/console.log "Saving state.")
   (state->local-storage))

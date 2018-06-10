@@ -5,7 +5,11 @@
 - [ ] Make generic "editable" component
 - [x] Put magic keyboard numbers in their own module.
 - [x] Add spec for review
-- [ ] Organize db file
+- [~] Run time spec checking
+   - [x] Check db
+   - [ ] Check ui
+- [ ] Write specs for events
+- [x] Organize db file
 - [~] Add note#show page
    - [ ] Add ability to edit note
    - [] Look into draft.js

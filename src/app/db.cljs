@@ -7,60 +7,38 @@
             [cljs-time.instant] ;; Required to serialize data objects as EDN.
             [cljs-time.extend]))
 
-;; -- Schema ---------------------------------------------------------------
+;; -- Spec -----------------------------------------------------------------
+;;
+;; This spec outlines the "schema" of our application state. Application state
+;; only changes through event handlers, so every time an event handler is run,
+;; the entire application state is checked through this spec.
 
 (s/def ::id       keyword?)
 (s/def ::deck-id  keyword?)
 (s/def ::name     string?)
 (s/def ::template string?)
-(s/def ::reviews  vector?)
 (s/def ::due      inst?)
 (s/def ::interval number?)
 (s/def ::remembered? boolean?)
-(s/def ::type (s/or :text  (= 'text)
-                    :image (= 'image)
-                    :audio (= 'audio)))
+(s/def ::type #{"text" "image" "audio"})
 
 (s/def ::deck   (s/keys :req-un [::id ::name ::template]))
 (s/def ::note   (s/keys :req-un [::id ::name]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
+
+(s/def ::review     (s/keys :req-un [::date ::due ::interval ::remembered?]))
+(s/def ::reviews    (s/coll-of ::review :kind vector?))
+(s/def :card/fields (s/map-of ::id string?))
+(s/def ::card       (s/keys :req-un [::id ::deck-id ::reviews :card/fields]
+                            :opt-un [::due]))
+
+(s/def ::decks  (s/map-of ::id ::deck))
+(s/def ::cards  (s/map-of ::id ::card))
+(s/def ::notes  (s/map-of ::id ::note))
 (s/def ::fields (s/map-of ::id ::field))
-(s/def ::card   (s/keys :req-un [::id ::deck-id ::reviews ::fields]
-                        :opt-un [::due]))
 
-(s/def ::review (s/keys :req-un [::date ::due ::interval ::remembered?]))
+(s/def ::db (s/keys :req-un [::decks ::notes ::fields]))
 
-;1/1 {:due 1/1} -> {:due 1/2} + {:date 1/1 :remembered? true} | 1 day
-;1/2 {:due 1/2} -> {:due 1/4} + {:date 1/2 :remembered? true} | 2 days
-;1/4 {:due 1/4} -> {:due 1/8} + {:date 1/4 :remembered? true} | 4 days
-
-;1/8 {:due 1/4} -> {:due 1/12} + {:date 1/8 :remembered? true} | 4 days
-;1/12 {:due 1/12} -> {:due 1/20} + {:date 1/12 :remembered? true} | 8 days
-
-;due-date - review-date = interval
-; If lapsed, use the previous interval.
-
-
-; NOTE: If automatically adjusting the interval modifier, we should keep track
-; of which reviews have which interval modifier, so that we have enough sample
-; data to adjust the interval modifier again.
-;
-; NOTE: A lapse should reduce the ease by 20 percentage points.
-
-; decks
-;   :parent-deck-id
-;   :name String
-;   :fields {id {:name String :type Type}}
-;   :card-template String
-;
-; cards
-;   :deck-id DeckID
-;   :reviews
-;   :next-review date
-;   :fields {field-id Value}
-; reviews
-;   :date
-;   :remembered?
 
 ;; -- Initial State --------------------------------------------------------
 
@@ -89,32 +67,6 @@
   (let [id (keyword (str (random-uuid)))]
     (swap! state assoc-in [:db model id] (assoc attrs :id id))
     id))
-
-;(def deck-id (-> random-uuid str keyword))
-;(def f1-id (-> random-uuid str keyword))
-;(def f2-id (-> random-uuid str keyword))
-;(def c1-id (-> random-uuid str keyword))
-;(def c2-id (-> random-uuid str keyword))
-
-;(def seed-data
-  ;{:name    "日本語"
-
-   ;:template "#{{Question}}\n\n---\n\n#{{Answer}}"
-
-   ;:fields  {f1-id {:name "Question" :type 'text}
-             ;f2-id {:name "Answer"   :type 'text}}
-
-   ;:cards   {c1-id {:due (today)
-                    ;:reviews []
-                    ;:fields {f1-id "こんにちは"
-                             ;f2-id "Hello"}}
-             ;c2-id {:reviews []
-                    ;:fields {f1-id "おはようございます"
-                             ;f2-id "Good morning"}}}})
-
-;(defonce init-db (do
-  ;(swap! state assoc-in [:db :decks deck-id]
-    ;(-> seed-data (assoc :id deck-id)))))
 
 (defn seed-data []
   (let [my-note
