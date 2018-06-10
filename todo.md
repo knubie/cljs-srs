@@ -3,8 +3,8 @@
 - [~] Optimize queries
 - [~] Add spec for notes
 - [ ] Make generic "editable" component
-- [ ] Add spec for review
 - [x] Put magic keyboard numbers in their own module.
+- [x] Add spec for review
 - [ ] Organize db file
 - [~] Add note#show page
    - [ ] Add ability to edit note

@@ -9,12 +9,14 @@
 
 ;; -- Schema ---------------------------------------------------------------
 
-(s/def ::id      keyword?)
-(s/def ::deck-id keyword?)
-(s/def ::name    string?)
+(s/def ::id       keyword?)
+(s/def ::deck-id  keyword?)
+(s/def ::name     string?)
 (s/def ::template string?)
-(s/def ::reviews vector?)
-(s/def ::due     inst?)
+(s/def ::reviews  vector?)
+(s/def ::due      inst?)
+(s/def ::interval number?)
+(s/def ::remembered? boolean?)
 (s/def ::type (s/or :text  (= 'text)
                     :image (= 'image)
                     :audio (= 'audio)))
@@ -26,7 +28,7 @@
 (s/def ::card   (s/keys :req-un [::id ::deck-id ::reviews ::fields]
                         :opt-un [::due]))
 
-(s/def ::review (s/keys :req-un [::date ::remembered?]))
+(s/def ::review (s/keys :req-un [::date ::due ::interval ::remembered?]))
 
 ;1/1 {:due 1/1} -> {:due 1/2} + {:date 1/1 :remembered? true} | 1 day
 ;1/2 {:due 1/2} -> {:due 1/4} + {:date 1/2 :remembered? true} | 2 days
