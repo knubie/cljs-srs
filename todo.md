@@ -1,4 +1,8 @@
 # Technical Debt
+- [x] Figure out how to not coerce unserialized dates
+   - [x] src/app/db
+   - [x] to-local-date
+   - [x] src/app/models/card
 - [x] Break up workspaces file
 - [~] Optimize queries
 - [~] Add spec for notes

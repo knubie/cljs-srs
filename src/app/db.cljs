@@ -147,8 +147,8 @@
        ;; TODO: make this more efficient, transducers?
        ;; TODO: Test with cards that have nil due
        (remove #(nil? (% :due)))
-       (filter #(or (cljs-time/before? (to-local-date (% :due)) (cljs-time/today))
-                    (cljs-time/equal?  (to-local-date (% :due)) (cljs-time/today))))))
+       (filter #(or (cljs-time/before? (% :due) (cljs-time/today))
+                    (cljs-time/equal?  (% :due) (cljs-time/today))))))
 
 ;(def to-learn (partial where :learning? true))
 (defn to-learn [collection]
@@ -167,11 +167,11 @@
 
 (defn local-storage->state []
   (reset! state (some->> (.getItem js/localStorage local-storage-key)
-                          edn/read-string)))
+                          (edn/read-string {:readers {'inst to-local-date}}))))
 
 (defn initialize-db []
   (let [local-storage-state (some->> (.getItem js/localStorage local-storage-key)
-                                     edn/read-string)]
+                                     (edn/read-string {:readers {'inst to-local-date}}))]
     (if (nil? local-storage-state)
       (seed-data)
       (local-storage->state))))

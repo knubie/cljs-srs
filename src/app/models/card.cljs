@@ -1,13 +1,11 @@
 (ns app.models.card
   (:require [cljs-time.format :refer [formatter unparse]]
-            [cljs-time.coerce :refer [to-local-date]]
             [cljs-time.core   :as t]))
 
 ;; TODO: Test me
 (defn formatted-due [card]
   (if (nil? (card :due))
     "Unlearned"
-    (->> (card :due) to-local-date (unparse (formatter "yyyy-MM-dd")))))
 
 ;; TODO: Test me
 (defn progress [card]
