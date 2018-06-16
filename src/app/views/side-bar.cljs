@@ -7,27 +7,33 @@
             [app.styles      :as styles]))
 
 (defn side-bar-section-item [{:keys [name icon on-click on-edit]}]
-  [:div {:on-click on-click
-         :style {:display 'flex
-                 :align-items 'center
-                 :min-height 27
-                 :font-size 14
-                 :padding "2px 14px"
-                 :width "100%"}}
-             [:div {:style {:color "rgba(0,0,0,0.2)"
-                            :margin-right 4}} [icon 18 18]]
-             [:div {:content-editable true
-                    :on-blur on-edit
-                    :on-key-down #(case (.-which %)
-                                    kbd/enter  (-> % .-target .blur)
-                                    kbd/escape (-> % .-target .blur)
-                                    nil)
-                    :style {:-webkit-user-modify 'read-write-plaintext-only
-                            :outline 0
-                            :white-space 'nowrap
-                            :overflow 'hidden 
-                            :text-overflow 'ellipsis}}
-              name]])
+  (r/with-let [background (r/atom "")]
+    [:div {:on-click on-click
+           :on-mouse-enter #(reset! background "rgba(58,56,52,0.08)")
+           :on-mouse-leave #(reset! background "")
+           :style {:display 'flex
+                   :background @background
+                   :align-items 'center
+                   :min-height 27
+                   :cursor 'pointer
+                   :font-size 14
+                   :padding "2px 14px"
+                   :width "100%"}}
+               [:div {:style {:color "rgba(0,0,0,0.2)"
+                              :margin-right 4}} [icon 18 18]]
+               [:div {;:content-editable true
+                      ;:suppress-content-editable-warning true
+                      :on-blur on-edit
+                      :on-key-down #(case (.-which %)
+                                      kbd/enter  (-> % .-target .blur)
+                                      kbd/escape (-> % .-target .blur)
+                                      nil)
+                      :style {:-webkit-user-modify 'read-write-plaintext-only
+                              :outline 0
+                              :white-space 'nowrap
+                              :overflow 'hidden 
+                              :text-overflow 'ellipsis}}
+                name]]))
 
 (defn side-bar-section [{:keys [title]} & children]
   [:div {:style {:margin-bottom 20}}

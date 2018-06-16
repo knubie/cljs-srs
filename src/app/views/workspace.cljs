@@ -2,9 +2,12 @@
   (:require [clojure.string :as str] 
             [reagent.core   :as r]
             [cljs-time.core :refer [today]]
+            [app.views.workspaces.study :refer [study learn]]
+            [app.views.workspaces.edit :refer [edit-template]]
             [app.views.util.keyboard :as kbd]
             [app.views.data-table :refer [data-table]]
             [app.views.ui    :as ui]
+            [app.views.icons :as icons]
             [app.views.card  :refer [render-card]]
             [app.styles     :as styles]
             [app.db         :refer [state ui-workspace where]]
@@ -22,44 +25,6 @@
       (-> note :content js/marked)}}]))
 
 
-(defn study [deck-id]
-  (r/with-let [current-side (r/atom 1)
-               last-side? (r/atom false)
-               next-side #(swap! current-side inc)
-               remember #(js/console.log "Remember.")
-               handler #(case (.-which %)
-                        kbd/space (if @last-side?
-                                    (remember)
-                                    (next-side))
-                        nil)
-               _ (js/document.addEventListener "keydown" handler)]
-
-    (let [due-card (->> @all-cards (where :deck-id deck-id)
-                                   (where :due (today)) vals first)
-          deck @(r/cursor state [:db :decks deck-id])
-          sides (-> deck :template (str/split #"---")) 
-          _ (reset! last-side? (= @current-side (count sides)))
-          deck-fields (->> @all-fields (where :deck-id deck-id))]
-
-      [:<>
-       (if due-card
-         [:<>
-          (for [side (take @current-side sides)]
-            [render-card due-card side deck-fields])
-
-          (if @last-side?
-            [:<> [ui/button "Forgot"
-                  #(dispatch [:review-card {:card-id (due-card :id)
-                                            :remembered? false}])]
-                 [ui/button "Remembered"
-                  #(dispatch [:review-card {:card-id (due-card :id)
-                                            :remembered? true}])]]
-            [ui/button "Next" next-side])]
-         [:div "No Cards!"])])
-
-    (finally (js/document.removeEventListener "keydown" handler))))
-
-
 (defn deck [deck-id]
   (let [deck        @(r/cursor state [:db :decks deck-id])
         deck-fields (->> @all-fields (where :deck-id deck-id) vals)
@@ -69,6 +34,7 @@
      [:div {:style {:margin-bottom "0.5em"}}
       
       [:div {:content-editable true
+             :suppress-content-editable-warning true
              :on-blur #(dispatch [:edit-deck-name {
                                   :deck-id deck-id
                                   :name    (-> % .-target .-textContent)}])
@@ -77,7 +43,9 @@
                            :-webkit-user-modify 'read-write-plaintext-only})}
        (deck :name)]]
 
-     [ui/button "Study" #(dispatch [:study deck-id])]
+     [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:edit-deck-template-ui deck-id])]
+     [ui/button "Review" #(dispatch [:study deck-id])]
+     [ui/button "Learn" #(dispatch [:learn deck-id])]
       [data-table deck-fields cards deck-id]]))
 
 
@@ -93,4 +61,6 @@
       ;; TODO: it's not clear what nth is doing here.
       :note  [note  (nth @ui-workspace 1)]
       :deck  [deck  (nth @ui-workspace 1)]
+      :edit-deck-template [edit-template (nth @ui-workspace 1)]
+      :learn [learn (nth @ui-workspace 1)]
       :study [study (nth @ui-workspace 1)])]])

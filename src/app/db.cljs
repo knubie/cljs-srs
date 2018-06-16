@@ -4,6 +4,7 @@
             [app.sample-note :refer [sample-note]]
             [reagent.core    :as r]
             [cljs-time.core  :as cljs-time]
+            [cljs-time.coerce :refer [to-local-date]]
             [cljs-time.instant] ;; Required to serialize data objects as EDN.
             [cljs-time.extend]))
 
@@ -20,6 +21,7 @@
 (s/def ::due      inst?)
 (s/def ::interval number?)
 (s/def ::remembered? boolean?)
+(s/def ::learning? boolean?)
 (s/def ::type #{"text" "image" "audio"})
 
 (s/def ::deck   (s/keys :req-un [::id ::name ::template]))
@@ -29,7 +31,7 @@
 (s/def ::review     (s/keys :req-un [::date ::due ::interval ::remembered?]))
 (s/def ::reviews    (s/coll-of ::review :kind vector?))
 (s/def :card/fields (s/map-of ::id string?))
-(s/def ::card       (s/keys :req-un [::id ::deck-id ::reviews :card/fields]
+(s/def ::card       (s/keys :req-un [::id ::deck-id ::reviews :card/fields ::learning?]
                             :opt-un [::due]))
 
 (s/def ::decks  (s/map-of ::id ::deck))
@@ -104,12 +106,14 @@
       (add-record! :cards
         {:deck-id my-deck
          :due     (cljs-time/today)
+         :learning? false
          :reviews []
          :fields  {question-field "こんにちは"
                    answer-field   "Hello"}})
 
       (add-record! :cards
         {:deck-id my-deck
+         :learning? true
          :reviews []
          :fields  {question-field "おはようございます"
                    answer-field   "Good morning"}}))))
@@ -136,6 +140,19 @@
   (->> collection vals
        (filter #(-> % key (= matcher)))
        first))
+
+;; TODO: Test me
+(defn to-review [collection]
+  (->> collection vals
+       ;; TODO: make this more efficient, transducers?
+       ;; TODO: Test with cards that have nil due
+       (remove #(nil? (% :due)))
+       (filter #(or (cljs-time/before? (to-local-date (% :due)) (cljs-time/today))
+                    (cljs-time/equal?  (to-local-date (% :due)) (cljs-time/today))))))
+
+;(def to-learn (partial where :learning? true))
+(defn to-learn [collection]
+  (->> collection (where :learning? true) vals))
 
 ;; -- Persistence ----------------------------------------------------------
 ;;

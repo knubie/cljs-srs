@@ -13,6 +13,8 @@
 
 (defmulti  handle first) ;; Tests the first arg.
 
+;; UI ----------------------------------
+
 (defmethod handle :select-deck
   [[_ deck-id]]
 
@@ -40,6 +42,20 @@
   [[_ deck-id]]
 
   (reset! ui-workspace [:study deck-id]))
+
+
+(defmethod handle :learn
+  [[_ deck-id]]
+
+  (reset! ui-workspace [:learn deck-id]))
+
+(defmethod handle :edit-deck-template-ui ;; FIXME: namespace db/ui events
+  [[_ deck-id]]
+
+  (reset! ui-workspace [:edit-deck-template deck-id]))
+
+;; /UI ----------------------------------
+
 
 
 (defmethod handle :learn-card
@@ -78,13 +94,24 @@
 
   (add-record! :cards {:deck-id deck-id
                        :reviews []
+                       :learning? true
+                       ;; TODO: Derive fields
                        :fields (into {} (for [field fields] [(field :id) ""]))}))
+
+;; TODO: Consolidate these two ----------------------
 
 (defmethod handle :edit-deck-name
   [[_ {:keys [deck-id name]}]]
 
   (swap! state assoc-in [:db :decks deck-id :name] name))
 
+
+(defmethod handle :edit-deck-template
+  [[_ {:keys [deck-id template]}]]
+
+  (swap! state assoc-in [:db :decks deck-id :template] template))
+
+;; TODO: ---------------------------------------------
 
 (defmethod handle :edit-card
   [[_ card]]

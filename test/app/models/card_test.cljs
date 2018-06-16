@@ -44,6 +44,11 @@
 
           "Remembering a card with no review history will make it due tomorrow")
 
+    (is (= (-> card remember :learning?)
+           false)
+
+          "Remembering a card removes it from the learning queue.")
+
     (is (= (-> card remember :reviews)
            [{:date        (today)
              :due         (tomorrow)
@@ -167,7 +172,12 @@
     (is (= (-> card forget :due)
              (tomorrow))
 
-          "TODO: Write me.")
+          "Minimum interval is one day.")
+
+    (is (= (-> card forget :learning?)
+           true)
+
+        "Marks the card as 'learning' to be reviewed again today.")
     
     (is (= (-> card forget :reviews last)
              {:date (today)
@@ -175,7 +185,7 @@
               :interval 1
               :remembered? false})
 
-          "TODO: Write me")))
+          "Adds a review record to show that it was not remembered.")))
 
 (deftest test-forget-with-one-review-past-due
   (let [card (assoc test-card :reviews
