@@ -28,7 +28,7 @@
                                       kbd/enter  (-> % .-target .blur)
                                       kbd/escape (-> % .-target .blur)
                                       nil)
-                      :style {:-webkit-user-modify 'read-write-plaintext-only
+                      :style {;:-webkit-user-modify 'read-write-plaintext-only
                               :outline 0
                               :white-space 'nowrap
                               :overflow 'hidden 

@@ -2,7 +2,7 @@
   (:require [clojure.string :as str] 
             [reagent.core   :as r]
             [cljs-time.core :refer [today]]
-            [app.views.workspaces.study :refer [study learn]]
+            [app.views.workspaces.study :as study]
             [app.views.workspaces.edit :refer [edit-template]]
             [app.views.util.keyboard :as kbd]
             [app.views.data-table :refer [data-table]]
@@ -43,9 +43,9 @@
                            :-webkit-user-modify 'read-write-plaintext-only})}
        (deck :name)]]
 
-     [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:edit-deck-template-ui deck-id])]
-     [ui/button "Review" #(dispatch [:study deck-id])]
-     [ui/button "Learn" #(dispatch [:learn deck-id])]
+     [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:ui/edit-deck-template deck-id])]
+     [ui/button "Review" #(dispatch [:ui/review deck-id])]
+     [ui/button "Learn" #(dispatch [:ui/learn deck-id])]
       [data-table deck-fields cards deck-id]]))
 
 
@@ -62,5 +62,5 @@
       :note  [note  (nth @ui-workspace 1)]
       :deck  [deck  (nth @ui-workspace 1)]
       :edit-deck-template [edit-template (nth @ui-workspace 1)]
-      :learn [learn (nth @ui-workspace 1)]
-      :study [study (nth @ui-workspace 1)])]])
+      :learn [study/learn (nth @ui-workspace 1)]
+      :review [study/review (nth @ui-workspace 1)])]])

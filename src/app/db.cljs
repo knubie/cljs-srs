@@ -28,6 +28,7 @@
 (s/def ::note   (s/keys :req-un [::id ::name]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 
+;; interval is days
 (s/def ::review     (s/keys :req-un [::date ::due ::interval ::remembered?]))
 (s/def ::reviews    (s/coll-of ::review :kind vector?))
 (s/def :card/fields (s/map-of ::id string?))
@@ -35,7 +36,7 @@
                             :opt-un [::due]))
 
 (s/def ::decks  (s/map-of ::id ::deck))
-(s/def ::cards  (s/map-of ::id ::card))
+(s/def ::cards  (s/map-of ::id ::card)) ;; TODO: cannot have due without reviews
 (s/def ::notes  (s/map-of ::id ::note))
 (s/def ::fields (s/map-of ::id ::field))
 
@@ -107,7 +108,12 @@
         {:deck-id my-deck
          :due     (cljs-time/today)
          :learning? false
-         :reviews []
+         :reviews [
+           {:date (cljs-time/today)
+            :due (cljs-time/today)
+            :interval 1
+            :remembered? true}
+         ]
          :fields  {question-field "こんにちは"
                    answer-field   "Hello"}})
 

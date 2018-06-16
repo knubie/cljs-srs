@@ -56,7 +56,7 @@
              :remembered? true}])
 
           "Remembering a card with no review history will add a new review
-           history item for today, and set the interval as 2.0")))
+           history item for today, and set the interval as 1")))
 
 
 (deftest test-remember-with-one-review

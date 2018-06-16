@@ -17,50 +17,58 @@
 ;; If you get one wrong, move it to the back of the list.
 (def review-queue [])
 
-(defn foobar [card]
+(defn foobar [card forgot remembered]
   (r/with-let [current-side (r/atom 1)
                last-side?   (r/atom false)
                next-side    #(swap! current-side inc)
-               remember     #(js/console.log "Remember.")
                handler      #(case (.-which %)
-                              kbd/space (if @last-side? (remember) (next-side))
+                              kbd/space (if @last-side? (remembered) (next-side))
                               nil)
                _ (js/document.addEventListener "keydown" handler)]
 
     (let [deck @(r/cursor state [:db :decks (card :deck-id)])
+          deck-fields (->> @all-fields (where :deck-id (card :deck-id)))
           sides (-> deck :template (str/split #"---"))
-          _ (reset! last-side? (= @current-side (count sides)))
-          deck-fields (->> @all-fields (where :deck-id (card :deck-id)))]
+          _ (reset! last-side? (= @current-side (count sides)))]
 
       [:<>
        [:div
-        (for [side (take @current-side sides)]
+        (for [side (take @current-side sides)] ^{:key side}
           [render-card card side deck-fields])]
        (if @last-side?
-         [:div [ui/button "Forgot"
-                 #(js/console.log "Forgot")]
-               [ui/button "Remembered"
-                 #(js/console.log "Remembered")]]
+         [:div [ui/button "Forgot" #(do (reset! current-side 1)
+                                        (forgot))]
+               [ui/button "Remembered" #(do (reset! current-side 1)
+                                            (remembered))]]
          [ui/button "Next" next-side])])
 
     (finally (js/document.removeEventListener "keydown" handler))))
 
 
-(defn study [deck-id]
+(defn review [deck-id]
   ;; Set up review queue here.
   (let [due-cards (->> @all-cards (where :deck-id deck-id) to-review)
         due-card (first due-cards)]
 
     (if due-card
-      [foobar due-card]
+      [foobar due-card
+       #(dispatch [:review-card {:card-id (due-card :id) :remembered? false}])
+       #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])]
       ;; TODO: Show hint that there are x number of unlearned cards.
       [:div "No Cards to study!"])))
 
 (defn learn [deck-id]
   ;; Set up review queue here.
-  (let [due-cards (->> @all-cards (where :deck-id deck-id) to-learn)
-        due-card (first due-cards)]
+  (r/with-let [due-slot (r/atom 0)]
 
-    (if due-card
-      [foobar due-card]
-      [:div "No Cards to learn!"])))
+    (let [due-cards (->> @all-cards (where :deck-id deck-id) to-learn)
+          _ (if (>= @due-slot (count due-cards))
+                    (reset! due-slot 0))
+          due-card (nth due-cards @due-slot)]
+
+      (if due-card
+        [foobar due-card
+         #(do (dispatch [:review-card {:card-id (due-card :id) :remembered? false}])
+              (swap! due-slot inc))
+         #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])]
+        [:div "No Cards to learn!"]))))

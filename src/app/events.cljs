@@ -38,18 +38,18 @@
 
   (swap! state assoc-in [:ui :modal :open?] false))
 
-(defmethod handle :study
+(defmethod handle :ui/review
   [[_ deck-id]]
 
-  (reset! ui-workspace [:study deck-id]))
+  (reset! ui-workspace [:review deck-id]))
 
 
-(defmethod handle :learn
+(defmethod handle :ui/learn
   [[_ deck-id]]
 
   (reset! ui-workspace [:learn deck-id]))
 
-(defmethod handle :edit-deck-template-ui ;; FIXME: namespace db/ui events
+(defmethod handle :ui/edit-deck-template
   [[_ deck-id]]
 
   (reset! ui-workspace [:edit-deck-template deck-id]))
@@ -67,7 +67,10 @@
 (defmethod handle :review-card
   [[_ {:keys [card-id remembered?]}]]
 
-  (swap! state update-in [:db :cards card-id] c/remember))
+  ;; TODO: Check args against a spec.
+  (if remembered?
+    (swap! state update-in [:db :cards card-id] c/remember)
+    (swap! state update-in [:db :cards card-id] c/forget)))
 
 ;(defmethod handle :delete-note [[_ note-id]]
   ;(swap! db-notes dissoc note-id))

@@ -6,10 +6,11 @@
 (defn formatted-due [card]
   (if (nil? (card :due))
     "Unlearned"
+    (->> (card :due) (unparse (formatter "yyyy-MM-dd")))))
 
 ;; TODO: Test me
 (defn progress [card]
-  "Newbie")
+  "Not Reviewed")
 
 (def default-ease 2.0)
 
@@ -36,10 +37,11 @@
             :interval next-interval
             :remembered? true})))) 
 
+;;TODO: Test this works with no reviews
 (defn forget [card]
   (let [last-review   (-> card :reviews last)
-        last-due      (or (last-review :due) (t/today))
-        last-interval (or (last-review :interval) 0.5)
+        last-due      (or (:due last-review) (t/today))
+        last-interval (or (:interval last-review) 0.5)
         next-interval (-> last-interval (/ default-ease) (max 1))
         next-due      (->> next-interval Math/round t/days (t/plus last-due) at-least-tomorrow)]
 
