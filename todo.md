@@ -25,7 +25,7 @@
    - [ ] Add support for custom colors (night mode)
 - [~] Start writing tests
    - [x] Add tests for srs system
-- [ ] Get resource/public/ shit into git
+- [x] Get resource/public/ shit into git
 - [ ] Remove data transformations from views
 - [ ] Make generic "editable" component
 

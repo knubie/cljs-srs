@@ -9,10 +9,14 @@
             [app.views.ui    :as ui]
             [app.views.icons :as icons]
             [app.views.card  :refer [render-card]]
+            [app.storage     :as storage]
             [app.styles     :as styles]
             [app.db         :refer [state ui-workspace where]]
             [app.models.card :as c]
             [app.events     :refer [dispatch]]))
+
+
+;(extend-type js/FileList ISeqable)
 
 ;; -- DB Cursors -----------------------------------------------------------
 
@@ -46,7 +50,11 @@
      [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:ui/edit-deck-template deck-id])]
      [ui/button "Review" #(dispatch [:ui/review deck-id])]
      [ui/button "Learn" #(dispatch [:ui/learn deck-id])]
-      [data-table deck-fields cards deck-id]]))
+     [:input {:name "myFile"
+              :type "file"
+              :on-change #(-> % .-target .-files (.item 0) .-path (storage/store-media deck-id))}]
+
+     [data-table deck-fields cards deck-id]]))
 
 
 (defn home []
