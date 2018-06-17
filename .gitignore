@@ -1,5 +1,10 @@
 out
 .cpcache
 electron/node_modules
-resources
+resources/node_modules
+resources/public/js
+resources/public/entypo
 .cljs_rhino_repl
+target
+.lein-failures
+figwheel_server.log

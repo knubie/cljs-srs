@@ -171,13 +171,12 @@
 (defn state->local-storage []
   (.setItem js/localStorage local-storage-key (prn-str @state)))
 
-(defn local-storage->state []
-  (reset! state (some->> (.getItem js/localStorage local-storage-key)
-                          (edn/read-string {:readers {'inst to-local-date}}))))
+(defn local-storage->state [local-storage-state]
+  (reset! state (some->> local-storage-state
+                         (edn/read-string {:readers {'inst to-local-date}}))))
 
 (defn initialize-db []
-  (let [local-storage-state (some->> (.getItem js/localStorage local-storage-key)
-                                     (edn/read-string {:readers {'inst to-local-date}}))]
+  (let [local-storage-state (.getItem js/localStorage local-storage-key)]
     (if (nil? local-storage-state)
       (seed-data)
-      (local-storage->state))))
+      (local-storage->state local-storage-state))))
