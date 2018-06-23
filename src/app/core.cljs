@@ -54,7 +54,8 @@
     [workspace]]
 
    [:> js/antd.Modal {:visible (@modal :open?)
-                      :bodyStyle {:padding 0}
+                      :bodyStyle {:padding "72px"}
+                      :width nil
                       :footer nil
                       :closable false
                       :onCancel #(dispatch [:close-modal])}
