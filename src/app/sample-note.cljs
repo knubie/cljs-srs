@@ -1,6 +1,11 @@
 (ns app.sample-note)
 
-(def sample-note
+(def welcome
+"# Welcome to Memo!
+Memo combines note taking with a powerful [Spaced Repition](https://en.wikipedia.org/wiki/Spaced_repetition) cards.
+On the left you can add new notes, as well as decks, which are collections of cards. Decks can also contain other decks inside them.")
+
+(def japanese
 "# よう
 The word よう(様) means `appearance` or `manner`. Because it is a noun we can modify it with い-adjectives or descriptive clauses.
 
