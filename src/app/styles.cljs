@@ -51,20 +51,31 @@
 
 (def border-strong "1px solid rgb(221, 225, 227)")
 (def border-weak "1px solid rgb(243, 243, 243)")
+(def weak-color "rgb(153, 153, 153)")
 
 (def table-columns {
   :display       'flex
   :border-top    border-strong
-  :border-bottom border-strong})
+  :border-bottom border-strong
+  :color         weak-color})
 
 (defn table-field-column [field-count] {
   :display      'flex
   :align-items  'center
+  ;:-webkit-user-modify 'read-write-plaintext-only
+  ;:outline      0
   :padding      "0 8px"
-  :flex-shrink  0
-  :height       32
+  ;:flex-shrink  0
+  :min-height   32
   :border-right border-weak
   :width        (/ (- 900 32) field-count)})
+
+(def table-cell {
+  :display     'flex
+  :align-items 'center
+  :padding      "5px 8px 6px"
+  :border-right border-weak
+  :cursor       'pointer})
 
 (def add-field {
   :display 'flex

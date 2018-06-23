@@ -14,10 +14,7 @@
 (def meta-data-count 2)
 
 (defn table-columns [fields meta-data deck-id]
-  [:div {:style {:display       'flex
-                 :border-top    border-strong
-                 :border-bottom border-strong
-                 :color weak-color}}
+  [:div {:style styles/table-columns}
  
    ;; Fields
    
@@ -28,28 +25,21 @@
              :on-blur #(dispatch [:edit-field
                     (assoc field :name (-> % .-target .-textContent))
                                   ])
-             :style {:display      'flex
-                     :align-items  'center
-                     :-webkit-user-modify 'read-write-plaintext-only
-                     :outline      0
-                     :padding      "0 8px"
-                     :height       32
-                     :width        (/ (- 900 32) (+ meta-data-count (count fields)))
-                     :border-right border-weak}}
+             :style (styles/table-field-column (+ meta-data-count (count fields)))}
+
        [icons/attach 13 13 4] (field :name)])
+
+   ;; Meta Data
 
     (for [datum meta-data]
       [:div {:key (datum :name)
-             :style {:display      'flex
-                     :align-items  'center
-                     :padding      "0 8px"
-                     :height       32
-                     :width        (/ (- 900 32) (+ meta-data-count (count fields)))
-                     :border-right border-weak}}
+             :style (styles/table-field-column (+ meta-data-count (count fields)))}
+
        (datum :name)])
 
  
    ;; Add Field
+
    [:div {:on-click #(dispatch [:add-field {:deck-id deck-id
                                             :name "New Image Field"
                                             :type "image"}])
@@ -94,13 +84,6 @@
 
 
 
-(def table-cell-style
-  {:display     'flex
-   :align-items 'center
-   :padding      "5px 8px 6px"
-   :border-right border-weak
-   :cursor       'pointer})
-
 (defmulti table-cell (fn [field & _] (:type field)))
 
 (defmethod table-cell "text" [field record width]
@@ -108,7 +91,7 @@
 
     [:div {:key (field :id)
            :on-click #(reset! editing? true)
-           :style (merge table-cell-style {:width width})}
+           :style (merge styles/table-cell {:width width})}
 
      (if @editing?
        [table-cell-text-edit {:text (-> record :fields ((field :id)))
@@ -134,31 +117,10 @@
                                 :field-value %}])}])}
 
     [:div {:key (field :id)
-           :style (merge table-cell-style {:width width})}
+           :style (merge styles/table-cell {:width width})}
 
        [:img {:src (-> record :fields ((field :id)))}]]])
 
-(defn table-cell-foo [field record width]
-  (r/with-let [editing? (r/atom false)]
-
-    [:div {:key (field :id)
-           :on-click #(reset! editing? true)
-           :style (merge table-cell-style {:width width})}
-
-     (if @editing?
-       [table-cell-text-edit {:text (-> record :fields ((field :id)))
-                              :on-save #(do
-                                (dispatch [:edit-card-field {
-                                  :card-id     (record :id)
-                                  :field-id    (field :id)
-                                  :field-value %}])
-                                (reset! editing? false))}]
-
-       (case (field :type)
-         "text" (-> record :fields ((field :id)))
-         "image" [:img {:src (-> record :fields ((field :id)))}]
-         "audio" (-> record :fields ((field :id))))
-    )]))
 
 (defn table-row [meta-data fields record]
   (r/with-let [hover? (r/atom false)]
@@ -183,9 +145,9 @@
       [:div {:key (datum :name)
              :style {:display      'flex
                      :align-items  'center
-                     :cursor 'default
+                     :cursor       'default
                      :padding      "0 8px"
-                     :height       32
+                     :min-height   32
                      :width        (/ (- 900 32) (+ meta-data-count (count fields)))
                      :border-right border-weak}}
        (-> record ((datum :fn)))])
