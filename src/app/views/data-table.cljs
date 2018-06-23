@@ -23,8 +23,7 @@
              :content-editable true
              :suppress-content-editable-warning true
              :on-blur #(dispatch [:edit-field
-                    (assoc field :name (-> % .-target .-textContent))
-                                  ])
+               (assoc field :name (-> % .-target .-textContent))])
              :style (styles/table-field-column (+ meta-data-count (count fields)))}
 
        [icons/attach 13 13 4] (field :name)])
@@ -114,7 +113,7 @@
                               [:edit-card-field {
                                 :card-id     (record :id)
                                 :field-id    (field :id)
-                                :field-value %}])}])}
+                                :field-value (js/encodeURI %)}])}])}
 
     [:div {:key (field :id)
            :style (merge styles/table-cell {:width width})}

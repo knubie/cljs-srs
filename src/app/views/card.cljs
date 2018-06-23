@@ -17,9 +17,7 @@
        (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      ;(-> template (render data) js/marked)}}]))
-      (.render (js/Remarkable.) (-> template (stache/render data)))
-      }}]))
+      (.render (js/Remarkable.) (-> template (stache/render data)))}}]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
@@ -34,4 +32,4 @@
              (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (-> template (stache/render data) js/marked)}}]))
+      (.render (js/Remarkable.) (-> template (stache/render data)))}}]))
