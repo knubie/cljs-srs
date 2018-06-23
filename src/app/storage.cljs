@@ -11,10 +11,12 @@
 
 (defn store-media [file-path deck-id]
   (let [save-path (.join path user-data-media (name deck-id))
-        file-name (.basename path file-path)]
+        file-name (.basename path file-path)
+        save-file-path (.join path save-path file-name)]
 
     (mkdir user-data-media)
     (mkdir save-path)
     (->> file-path
          (.readFileSync fs)
-         (.writeFileSync fs (.join path save-path file-name)))))
+         (.writeFileSync fs save-file-path))
+    save-file-path))

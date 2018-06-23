@@ -1,7 +1,9 @@
 (ns app.views.data-table
   (:require [reagent.core   :as r]
+            [cljsjs.antd]
             [app.events     :refer [dispatch]]
             [app.models.card :as c]
+            [app.views.util.image-upload :refer [image-upload]]
             [app.views.icons :as icons]
             [app.views.util.keyboard :as kbd]
             [app.styles     :as styles]))
@@ -34,7 +36,7 @@
                      :height       32
                      :width        (/ (- 900 32) (+ meta-data-count (count fields)))
                      :border-right border-weak}}
-       (field :name)])
+       [icons/attach 13 13 4] (field :name)])
 
     (for [datum meta-data]
       [:div {:key (datum :name)
@@ -49,7 +51,7 @@
  
    ;; Add Field
    [:div {:on-click #(dispatch [:add-field {:deck-id deck-id
-                                            :name "New Field"
+                                            :name "New Image Field"
                                             :type "image"}])
           :style {:display 'flex
                   :align-items 'center
@@ -99,7 +101,44 @@
    :border-right border-weak
    :cursor       'pointer})
 
-(defn table-cell [field record width]
+(defmulti table-cell (fn [field & _] (:type field)))
+
+(defmethod table-cell "text" [field record width]
+  (r/with-let [editing? (r/atom false)]
+
+    [:div {:key (field :id)
+           :on-click #(reset! editing? true)
+           :style (merge table-cell-style {:width width})}
+
+     (if @editing?
+       [table-cell-text-edit {:text (-> record :fields ((field :id)))
+                              :on-save #(do
+                                (dispatch [:edit-card-field {
+                                  :card-id     (record :id)
+                                  :field-id    (field :id)
+                                  :field-value %}])
+                                (reset! editing? false))}]
+       (-> record :fields ((field :id))))]))
+
+(defmethod table-cell "image" [field record width]
+  [:> js/antd.Popover {:placement "bottom"
+                       :title "Upload"
+                       :trigger "click"
+                       :content (r/as-element
+                         [image-upload
+                           {:dir (record :deck-id)
+                            :on-upload #(dispatch
+                              [:edit-card-field {
+                                :card-id     (record :id)
+                                :field-id    (field :id)
+                                :field-value %}])}])}
+
+    [:div {:key (field :id)
+           :style (merge table-cell-style {:width width})}
+
+       [:img {:src (-> record :fields ((field :id)))}]]])
+
+(defn table-cell-foo [field record width]
   (r/with-let [editing? (r/atom false)]
 
     [:div {:key (field :id)
@@ -138,21 +177,6 @@
 
      (for [field fields] ^{:key (:id field)}
        [table-cell field record (/ (- 900 32) (+ meta-data-count (count fields)))])
-       ;; Field
-       ;[:div {:key (field :id)
-              ;:content-editable true
-              ;:on-blur #(dispatch [:edit-card-field {
-                ;:card-id     (record :id)
-                ;:field-id    (field :id)
-                ;:field-value (-> % .-target .-textContent)}])
-              ;:style {:display     'flex
-                      ;:align-items 'center
-                      ;:-webkit-user-modify 'read-write-plaintext-only
-                      ;:outline      0
-                      ;:padding      "5px 8px 6px"
-                      ;:border-right border-weak
-                      ;:width        (/ (- 900 32) (+ meta-data-count (count fields)))}}
-        ;(-> record :fields ((field :id)))])
 
 
     (for [datum meta-data]

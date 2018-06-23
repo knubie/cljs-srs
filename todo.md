@@ -3,6 +3,8 @@
 - [ ] Break out sidebar into separate files in sidebar/ dir
 - [ ] Strip newlines from table columns, etc.
 - [ ] Fix the isOver behavior for dragging decks around
+- [ ] Use keywords instead of strings for field type
+   - [ ] update src/app/views/data-table
 - [x] Figure out how to not coerce unserialized dates
    - [x] src/app/db
    - [x] to-local-date
