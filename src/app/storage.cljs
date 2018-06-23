@@ -4,6 +4,7 @@
 (def electron (js/require "electron"))
 (def fs (js/require "fs"))
 (def path (js/require "path"))
+(defn mkdir [dir] (if-not (.existsSync fs dir) (.mkdirSync fs dir)))
 
 (def user-data (-> electron .-remote .-app (.getPath "userData")))
 (def user-data-media (.join path user-data "media"))
@@ -12,8 +13,8 @@
   (let [save-path (.join path user-data-media (name deck-id))
         file-name (.basename path file-path)]
 
-    (.mkdirSync fs user-data-media)
-    (.mkdirSync fs save-path)
+    (mkdir user-data-media)
+    (mkdir save-path)
     (->> file-path
          (.readFileSync fs)
          (.writeFileSync fs (.join path save-path file-name)))))

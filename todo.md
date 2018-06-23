@@ -2,6 +2,7 @@
 - [ ] Clean up DnD implementation
 - [ ] Break out sidebar into separate files in sidebar/ dir
 - [ ] Strip newlines from table columns, etc.
+- [ ] Fix the isOver behavior for dragging decks around
 - [x] Figure out how to not coerce unserialized dates
    - [x] src/app/db
    - [x] to-local-date
@@ -43,22 +44,28 @@
 - [ ] Backups
 
 # Launch MVP
+- [ ] Link notes to cards
+   - [] Add a "notes" field type
+      - Contains a list of note IDs
+   - [] When the card is rendered, it will have links for each linked note
+   - [] When clicked, there will be a popup with the note in it.
 - [ ] Saved filters, acts like Anki, UI like notion.
+   - Notion UI like table views?
 - [ ] Write a blog post on how to use Memo for language learning.
-- [ ] Add a default "Welcome to Memo" note
+- [~] Add a default "Welcome to Memo" note
 - [ ] Dogfood complete
-- [ ] Add metadata to the deck table
-   - [ ] Due
-   - [ ] Maturity
+- [x] Add metadata to the deck table
+   - [x] Due
+   - [~] Maturity
 - [x] Local storage sync
    - [x] Loads seed data if no localstorage is found.
    - [ ] Improve seed data ( Right now it's all japanese shit. )
-- [ ] SRS System working
+- [x] SRS System working
    - [x] Remember and forget cards
-   - [ ] Learn new cards
+   - [x] Learn new cards
 - [ ] Fix UI quirks
    - [~] Hover / pointer on sidebar
-   - [ ] Fix preview placement on deck table
+   - [ ] Fix preview-button placement on deck table
    - [ ] Add something to the top of the side bar (or not)
 - [ ] Figure out a better way to handle deck re-naming.
    - [ ] Right click context menu?
