@@ -1,7 +1,7 @@
 (ns app.db
   (:require [cljs.spec.alpha :as s]
             [cljs.reader     :as edn]
-            [app.sample-note :refer [sample-note]]
+            [app.sample-note :as sample-note]
             [reagent.core    :as r]
             [cljs-time.core  :as cljs-time]
             [cljs-time.coerce :refer [to-local-date]]
@@ -24,7 +24,8 @@
 (s/def ::learning? boolean?)
 (s/def ::type #{"text" "image" "audio"})
 
-(s/def ::deck   (s/keys :req-un [::id ::name ::template]))
+(s/def ::deck   (s/keys :req-un [::id ::name ::template]
+                        :opt-un [::deck-id]))
 (s/def ::note   (s/keys :req-un [::id ::name]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 
@@ -72,20 +73,31 @@
     id))
 
 (defn seed-data []
-  (let [my-note
+  (let [welcome-note
+          (add-record! :notes
+            {:name "Welcome to Memo!"
+             :content sample-note/welcome})
+
+        my-note
           (add-record! :notes
             {:name "日本語の文法"
-             :content sample-note})
+             :content sample-note/japanese})
 
         my-deck
           (add-record! :decks
             {:name   "日本語"
-             :template "#{{Question}}\n\n---\n\n#{{Answer}}"})
+             :template "# {{Japanese}}\n---\n# {{Japanese}}\n# {{English}}"})
+
+        sub-deck
+          (add-record! :decks
+            {:name "アニメ"
+             :deck-id my-deck
+             :template "# {{Japanese}}\n---\n# {{Japanese}}\n# {{English}}"})
 
         other-deck
           (add-record! :decks
             {:name   "Sample Deck"
-             :template "#{{Front}}\n\n---\n\n#{{Back}}"})
+             :template "# {{Front}}\n---\n# {{Front}}\n# {{Back}}"})
 
         _
           (add-record! :fields
@@ -95,13 +107,21 @@
           (add-record! :fields
             {:deck-id other-deck :name "Back" :type "text"})
 
+        _
+          (add-record! :fields
+            {:deck-id sub-deck :name "Japanese" :type "text"})
+
+        _
+          (add-record! :fields
+            {:deck-id sub-deck :name "English" :type "text"})
+
         question-field
           (add-record! :fields
-            {:deck-id my-deck :name "Question" :type "text"})
+            {:deck-id my-deck :name "Japanese" :type "text"})
 
         answer-field
           (add-record! :fields
-            {:deck-id my-deck :name "Answer" :type "text"})]
+            {:deck-id my-deck :name "English" :type "text"})]
 
     (do
       (add-record! :cards
@@ -122,7 +142,9 @@
          :learning? true
          :reviews []
          :fields  {question-field "おはようございます"
-                   answer-field   "Good morning"}}))))
+                   answer-field   "Good morning"}})
+        
+      (swap! state assoc-in [:ui :workspace] [:note welcome-note]))))
 
 ;; -- Query Helpers --------------------------------------------------------
 ;;

@@ -21,7 +21,7 @@
   (swap! state assoc-in [:ui :workspace] [:deck deck-id]))
 
 
-(defmethod handle :select-note
+(defmethod handle :ui/select-note
   [[_ note-id]]
 
   (swap! state assoc-in [:ui :workspace] [:note note-id]))
@@ -86,9 +86,9 @@
 
   (let [deck-id (add-record! :decks deck)]
     (add-record! :fields
-      {:deck-id deck-id :name "Question" :type "text"})
+      {:deck-id deck-id :name "Front" :type "text"})
     (add-record! :fields
-      {:deck-id deck-id :name "Answer" :type "text"})
+      {:deck-id deck-id :name "Back" :type "text"})
     (handle [:select-deck deck-id])))
 
 
@@ -130,6 +130,7 @@
 (defmethod handle :edit-card-field
   [[_ {:keys [card-id field-id field-value]}]]
 
+  (js/console.log (str "Saving: " field-value))
   (swap! state assoc-in [:db :cards card-id :fields field-id] field-value))
 
 

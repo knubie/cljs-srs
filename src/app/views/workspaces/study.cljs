@@ -33,8 +33,7 @@
 
       [:<>
        [:div
-        (for [side (take @current-side sides)] ^{:key side}
-          [render-card card side deck-fields])]
+        [render-card card (nth sides (- @current-side 1)) deck-fields]]
        (if @last-side?
          [:div [ui/button "Forgot" #(do (reset! current-side 1)
                                         (forgot))]
