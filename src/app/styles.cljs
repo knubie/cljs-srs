@@ -7,6 +7,7 @@
 })
 
 (def side-bar {
+  :padding-top      "45px"
   :background-color "#F9F7F4"
   :color            "#787877"
   :text-align       "left"
