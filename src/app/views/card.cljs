@@ -2,11 +2,12 @@
   (:require [reagent.core   :as r]
             [app.models.card :refer [formatted-due]]
             [app.db         :refer [state where find-one]]
-            [cljstache.core :refer [render]]))
+            [cljstache.core :as stache]))
 
 (def all-cards (r/cursor state [:db :cards]))
 (def all-decks (r/cursor state [:db :decks]))
 (def all-fields (r/cursor state [:db :fields]))
+(def md (js/Remarkable.))
 
 ;; TODO: Rename this?
 (defn render-card [card template deck-fields]
@@ -16,14 +17,9 @@
        (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (-> template (render data) js/marked)}}]))
-
-(defn render-card2 [card-id]
-  (let [card (@all-cards card-id)
-        ;deck (@all-decks (card :deck-id))
-        ;template (deck :template)
-        ]
-    [:div (-> card formatted-due)]))
+      ;(-> template (render data) js/marked)}}]))
+      (.render (js/Remarkable.) (-> template (stache/render data)))
+      }}]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
@@ -38,4 +34,4 @@
              (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (-> template (render data) js/marked)}}]))
+      (-> template (stache/render data) js/marked)}}]))
