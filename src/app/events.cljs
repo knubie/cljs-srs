@@ -90,6 +90,11 @@
     (add-record! :fields
       {:deck-id deck-id :name "Answer" :type "text"})
     (handle [:select-deck deck-id])))
+
+
+(defmethod handle :nest-deck
+  [[_ child-deck-id parent-deck-id]]
+  (swap! state assoc-in [:db :decks child-deck-id :deck-id] parent-deck-id))
   
 
 (defmethod handle :add-empty-card

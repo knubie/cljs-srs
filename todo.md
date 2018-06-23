@@ -1,4 +1,7 @@
 # Technical Debt
+- [ ] Clean up DnD implementation
+- [ ] Break out sidebar into separate files in sidebar/ dir
+- [ ] Strip newlines from table columns, etc.
 - [x] Figure out how to not coerce unserialized dates
    - [x] src/app/db
    - [x] to-local-date
@@ -11,10 +14,10 @@
 - [~] Run time spec checking
    - [x] Check db
    - [ ] Check ui
-   - [] specs for events
-- [] Come up with a system for scopes and queries
-   - [] When do we return the collections with keys
-   - [] When do we return the vals?
+   - [ ] specs for events
+- [ ] Come up with a system for scopes and queries
+   - [ ] When do we return the collections with keys
+   - [ ] When do we return the vals?
 - [ ] Write specs for events
 - [ ] Add docustrings to functions
 - [x] Organize db file
@@ -30,30 +33,33 @@
 - [ ] Make generic "editable" component
 
 # Dogfood Req
-- [] Backups
-- [] Working SRS
-- [] Furigana support
-- [] Import from csv
-   - [] Import from Anki
-- [] Images on cards
-- [] Audio on cards
-- [] Backups
+- [ ] Backups
+- [ ] Working SRS
+- [ ] Furigana support
+- [ ] Import from csv
+   - [ ] Import from Anki
+- [ ] Images on cards
+- [ ] Audio on cards
+- [ ] Backups
 
 # Launch MVP
-- [] Dogfood complete
-- [] Add metadata to the deck table
-   - [] Due
-   - [] Maturity
+- [ ] Saved filters, acts like Anki, UI like notion.
+- [ ] Write a blog post on how to use Memo for language learning.
+- [ ] Add a default "Welcome to Memo" note
+- [ ] Dogfood complete
+- [ ] Add metadata to the deck table
+   - [ ] Due
+   - [ ] Maturity
 - [x] Local storage sync
    - [x] Loads seed data if no localstorage is found.
    - [ ] Improve seed data ( Right now it's all japanese shit. )
-- [] SRS System working
+- [ ] SRS System working
    - [x] Remember and forget cards
-   - [] Learn new cards
-- [] Fix UI quirks
+   - [ ] Learn new cards
+- [ ] Fix UI quirks
    - [~] Hover / pointer on sidebar
-   - [] Fix preview placement on deck table
-   - [] Add something to the top of the side bar (or not)
+   - [ ] Fix preview placement on deck table
+   - [ ] Add something to the top of the side bar (or not)
 - [ ] Figure out a better way to handle deck re-naming.
    - [ ] Right click context menu?
    - [ ] Edit title on show page?
@@ -63,6 +69,9 @@
 - [ ] Figure out search
 
 # Later features
+- [ ] Two card templates.
+   - [ ] One for the SRS Card
+   - [ ] One for embedding the card into notes
 - [ ] Add cards view to decks#show
 - [ ] Refactor state/ui to allow for undoing/going back
    - [ ] Separate events into db events and ui events

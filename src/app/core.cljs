@@ -1,7 +1,7 @@
 (ns app.core
-  (:require [cljs.spec.alpha     :as spec]
-            [reagent.core        :as r]
+  (:require [reagent.core        :as r]
             [cljsjs.antd]
+            [app.dnd             :as dnd]
             [app.db              :refer [modal initialize-db]]
             [app.events          :refer [dispatch]]
             [app.views.card      :refer [render-card3]]
@@ -9,7 +9,7 @@
             [app.views.workspace :refer [workspace]]
             [app.views.ui        :as ui]
             [app.styles          :as styles]))
-  
+
 
 ;; -- Markdown settings ----------------------------------------------------
 ;(def renderer (new (.-Renderer js/marked)))
@@ -27,6 +27,19 @@
 
 ;fs.readFileSync('<directory>')
 ;fs.writeFileSync(file)
+
+
+;; -- React DnD  -----------------------------------------------------------
+
+(def react->reagent r/adapt-react-class)
+(def reagent->react r/reactify-component)
+
+;; -- Data Initialization --------------------------------------------------
+;;
+;; This is where we initialize the data. First, we look in localStorage
+;; and parse the edn if there is any. If not, we seed some data.
+;;
+;; See app.db/initialize-db for more info.
 
 (initialize-db)
 
@@ -57,10 +70,17 @@
        [render-card3 (@modal :card-id)]]
     )]])
 
+(defn with-drag-drop-context [app]
+  (-> app
+      reagent->react
+      ((js/ReactDnD.DragDropContext (.-default js/ReactDnDHTML5Backend)))
+      react->reagent))
+
 ;; -- Entry Point ----------------------------------------------------------
 ;;
 ;; This function gets run in the index.html page.
 
 (defn ^:export run []
-  (r/render [app] (js/document.getElementById "app")))
-  
+  (r/render
+    [(dnd/with-drag-drop-context dnd/html-backend app)]
+    (js/document.getElementById "app")))
