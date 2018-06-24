@@ -2,6 +2,8 @@
   (:require [reagent.core :as r]
             [app.events      :refer [dispatch]]))
 
+;; -- Rename stuff ---------------------------------------------------------
+
 (def react->reagent r/adapt-react-class)
 (def reagent->react r/reactify-component)
 
@@ -17,70 +19,50 @@
       ((drag-drop-context backend))
       react->reagent))
 
+
 ;; -- Drag Source ----------------------------------------------------------
 
-(def drag-source
-  (.-DragSource js/ReactDnD))
+(defn drag-source [component opts]
+  (((.-DragSource js/ReactDnD)
+    (clj->js (opts :type))      ;; Type
+    (clj->js (opts :drag-spec)) ;; Spec
+    (fn [connect monitor]       ;; Collection Fn
+      (clj->js ((opts :drag-collect) connect monitor)))
 
-(def drag-spec #js {:beginDrag (fn [props monitor component]
-                           #js {:deckId (.-deckId props)})
+  ) component)
+)
 
-                    :endDrag (fn [props monitor component]
-                               (js/console.log "endDarg")
-                               (if (.didDrop monitor)
-                                 (do (js/console.log (.getDropResult monitor))
-                                 (dispatch [:nest-deck
-                                            (keyword (.-deckId props))
-                                            (keyword (.-deckId (.getDropResult monitor)))
-                                            ]))
-                                 ;(js/console.log (.getDropResult monitor))
-                                 (js/console.log "Didn't drop")
-                               )
-                             )
-                    })
-
-(defn drag-collect [connect monitor] #js {:connectDragSource (.dragSource connect)})
-
-(defn as-drag-source [component]
+(defn as-drag-source [component opts]
   (-> component
       reagent->react
-      ((drag-source "deck-item" drag-spec drag-collect))
+      (drag-source opts)
       react->reagent))
+
 
 ;; -- Drop Target ----------------------------------------------------------
 
-(def drop-target
-  (.-DropTarget js/ReactDnD))
+(defn drop-target [component opts]
+  (((.-DropTarget js/ReactDnD)
+    (clj->js (opts :type))      ;; Type
+    (clj->js (opts :drop-spec)) ;; Spec
+    (fn [connect monitor]       ;; Collection Fn
+      (clj->js ((opts :drop-collect) connect monitor)))
 
-(def drop-spec #js {:drop (fn [props monitor component]
-                            (js/console.log (.-deckId props))
-                            (if (.didDrop monitor)
-                              js/undefined
-                              #js {:deckId (.-deckId props)}))
-                    :hover (fn [props monitor component]
-                               (js/console.log (.canDrop monitor)))
-                    :canDrop (fn [props monitor]
-                               (not= (.-deckId props)
-                                     (.-deckId (.getItem monitor))))})
+  ) component)
+)
 
-(defn drop-collect [connect monitor] #js {:connectDropTarget (.dropTarget connect)
-                            :isOver (and
-                                      (.canDrop monitor)
-                                      (.isOver monitor )
-                                    )
-                            })
-
-(defn as-drop-target [component]
+(defn as-drop-target [component opts]
   (-> component
       reagent->react
-      ((drop-target "deck-item" drop-spec drop-collect))
+      (drop-target opts)
       react->reagent))
+
 
 ;; -- Both at the Same Time! -----------------------------------------------
 
-(defn as-drag-source-and-drop-target [component]
+(defn as-drag-source-and-drop-target [component opts]
   (-> component
       reagent->react
-      ((drag-source "deck-item" drag-spec drag-collect))
-      ((drop-target "deck-item" drop-spec drop-collect))
+      (drag-source opts)
+      (drop-target opts)
       react->reagent))

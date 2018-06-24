@@ -1,19 +1,21 @@
 # Technical Debt
-- [ ] Clean up DnD implementation
-- [ ] Break out sidebar into separate files in sidebar/ dir
+- [x] Clean up DnD implementation
+- [x] Break out sidebar into separate files in sidebar/ dir
+- [ ] Performance monitoring
+   - When are components re-rendering
+   - When are they querying the database when they don't need to?
+      - See: side-bar/deck-item.
+      - It rerenders when the background changes, meaning it re-queries the
+        db for its decks every time. We could cache the result using r/track
+        or something like that.
+- [ ] Break out data-table into separate files
+   - [ ] rename to deck-table
 - [ ] Strip newlines from table columns, etc.
 - [ ] Fix the isOver behavior for dragging decks around
 - [ ] Use keywords instead of strings for field type
    - [ ] update src/app/views/data-table
-- [x] Figure out how to not coerce unserialized dates
-   - [x] src/app/db
-   - [x] to-local-date
-   - [x] src/app/models/card
-- [x] Break up workspaces file
 - [~] Optimize queries
 - [~] Add spec for notes
-- [x] Put magic keyboard numbers in their own module.
-- [x] Add spec for review
 - [~] Run time spec checking
    - [x] Check db
    - [ ] Check ui
@@ -23,7 +25,6 @@
    - [ ] When do we return the vals?
 - [ ] Write specs for events
 - [ ] Add docustrings to functions
-- [x] Organize db file
 - [~] Add note#show page
    - [ ] Add ability to edit note
    - [ ] Look into draft.js
@@ -31,7 +32,6 @@
    - [ ] Add support for custom colors (night mode)
 - [~] Start writing tests
    - [x] Add tests for srs system
-- [x] Get resource/public/ shit into git
 - [ ] Remove data transformations from views
 - [ ] Make generic "editable" component
 

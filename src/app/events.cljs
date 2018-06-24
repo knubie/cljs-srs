@@ -81,10 +81,20 @@
   (add-record! :cards card))
 
 
-(defmethod handle :add-deck
-  [[_ deck]]
+(defmethod handle :new-note
+  [_]
 
-  (let [deck-id (add-record! :decks deck)]
+  (add-record! :notes {:name    "New Note"
+                       :content "Edit me!"}))
+
+
+(defmethod handle :new-deck
+  [_]
+
+  (let [deck-id (add-record! :decks
+    {:name     "New Deck"
+     :template "#{{Front}}\n\n---\n\n#{{Back}}"})]
+
     (add-record! :fields
       {:deck-id deck-id :name "Front" :type "text"})
     (add-record! :fields
