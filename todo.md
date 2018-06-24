@@ -1,6 +1,4 @@
 # Technical Debt
-- [x] Clean up DnD implementation
-- [x] Break out sidebar into separate files in sidebar/ dir
 - [ ] Performance monitoring
    - When are components re-rendering
    - When are they querying the database when they don't need to?
@@ -41,8 +39,8 @@
 - [ ] Furigana support
 - [ ] Import from csv
    - [ ] Import from Anki
-- [ ] Images on cards
-- [ ] Audio on cards
+- [x] Images on cards
+- [x] Audio on cards
 - [ ] Backups
 
 # Launch MVP

@@ -17,7 +17,7 @@
        (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (.render (js/Remarkable.) (-> template (stache/render data)))}}]))
+      (.render (js/Remarkable. #js {:html true}) (-> template (stache/render data)))}}]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]

@@ -121,6 +121,26 @@
        [:img {:src (-> record :fields ((field :id)))}]]])
 
 
+(defmethod table-cell "audio" [field record width]
+  [:> js/antd.Popover {:placement "bottom"
+                       :title "Upload"
+                       :trigger "click"
+                       :content (r/as-element
+                         [image-upload
+                           {:dir (record :deck-id)
+                            :on-upload #(dispatch
+                              [:edit-card-field {
+                                :card-id     (record :id)
+                                :field-id    (field :id)
+                                :field-value (js/encodeURI %)}])}])}
+
+    [:div {:key (field :id)
+           :style (merge styles/table-cell {:width width})}
+
+       [:audio {:src (-> record :fields ((field :id)))
+                :controls true}]]])
+
+
 (defn table-row [meta-data fields record]
   (r/with-let [hover? (r/atom false)]
 
