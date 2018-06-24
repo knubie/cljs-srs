@@ -3,7 +3,7 @@
             [app.storage     :as storage]))
 
 (defn image-upload [{:keys [dir on-upload]}]
-   [:input {:name "myFile"
+   [:input {:name "image-upload"
             :type "file"
             :on-change (fn [e]
               (let [file (-> e .-target .-files (.item 0) .-path )

@@ -1,4 +1,5 @@
 # Technical Debt
+- [] Change add-record! signature to make record first arg, update import.cljs
 - [ ] Performance monitoring
    - When are components re-rendering
    - When are they querying the database when they don't need to?

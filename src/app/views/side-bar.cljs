@@ -6,7 +6,10 @@
             [app.views.side-bar.section :refer [section]]
             [app.views.icons :as icons]
             [app.views.util.keyboard :as kbd]
+            [app.views.util.import :refer [import-deck]]
             [app.styles      :as styles]))
+
+(def fs (js/require "fs"))
 
 (defn side-bar-section-item [{:keys [name icon on-click]}]
   (r/with-let [background (r/atom "")]
@@ -54,4 +57,6 @@
                                :key :new-deck
                                :icon icons/plus
                                :depth 1
-                               :on-click #(dispatch [:new-deck])}]]]]))
+                               :on-click #(dispatch [:new-deck])}]
+       [import-deck]
+       ]]]))

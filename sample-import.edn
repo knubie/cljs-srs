@@ -1,0 +1,24 @@
+{:fields {:kanji {:name "Kanji"
+                  :type "text"}
+          :keyword {:name "Keyword"
+                    :type "text"}}
+ :cards [ {:fields {:kanji "一"
+                    :keyword "one"}}
+          {:fields {:kanji "二"
+                    :keyword "two"}}
+          {:fields {:kanji "三"
+                    :keyword "three"}}
+          {:fields {:kanji "四"
+                    :keyword "four"}}
+          {:fields {:kanji "五"
+                    :keyword "five"}}
+          {:fields {:kanji "六"
+                    :keyword "six"}}
+          {:fields {:kanji "七"
+                    :keyword "seven"}}
+          {:fields {:kanji "八"
+                    :keyword "eight"}}
+          {:fields {:kanji "九"
+                    :keyword "nine"}}
+          {:fields {:kanji "十"
+                      :keyword "ten"}}]}
