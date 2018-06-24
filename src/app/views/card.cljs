@@ -7,7 +7,7 @@
 (def all-cards (r/cursor state [:db :cards]))
 (def all-decks (r/cursor state [:db :decks]))
 (def all-fields (r/cursor state [:db :fields]))
-(def md (js/Remarkable.))
+(def remarkable (js/Remarkable. #js {:html true}))
 
 ;; TODO: Rename this?
 (defn render-card [card template deck-fields]
@@ -17,7 +17,7 @@
        (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (.render (js/Remarkable. #js {:html true}) (-> template (stache/render data)))}}]))
+      (.render remarkable (-> template (stache/render data)))}}]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
@@ -32,4 +32,4 @@
              (-> card :fields id)]))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (.render (js/Remarkable.) (-> template (stache/render data)))}}]))
+      (.render remarkable (-> template (stache/render data)))}}]))

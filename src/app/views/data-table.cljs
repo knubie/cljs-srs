@@ -19,6 +19,7 @@
    ;; Fields
    
     (for [field fields]
+      ;;[icons/attach 13 13 4] 
       [:div {:key (field :id)
              :content-editable true
              :suppress-content-editable-warning true
@@ -26,7 +27,7 @@
                (assoc field :name (-> % .-target .-textContent))])
              :style (styles/table-field-column (+ meta-data-count (count fields)))}
 
-       [icons/attach 13 13 4] (field :name)])
+       (field :name)])
 
    ;; Meta Data
 
