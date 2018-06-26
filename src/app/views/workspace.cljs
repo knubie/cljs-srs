@@ -49,6 +49,7 @@
      [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:ui/edit-deck-template deck-id])]
      [ui/button "Review" #(dispatch [:ui/review deck-id])]
      [ui/button "Learn" #(dispatch [:ui/learn deck-id])]
+     [ui/button "Delete" #(dispatch [:delete-deck deck-id])]
 
      [data-table deck-fields cards deck-id]]))
 

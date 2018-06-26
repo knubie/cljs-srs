@@ -1,6 +1,6 @@
 (ns app.events
   (:require [cljs.spec.alpha :as s]
-            [app.db :refer [state ui-workspace
+            [app.db :refer [state ui-workspace where
                             add-record! state->local-storage]]
             [app.models.card :as c]))
 
@@ -86,6 +86,25 @@
 
   (add-record! :notes {:name    "New Note"
                        :content "Edit me!"}))
+
+
+(defmethod handle :delete-deck
+  [[_ deck-id]]
+
+  ;(swap! state #(-> %
+
+                    ;(update-in [:db :decks] dissoc deck-id) 
+
+                 ;)))
+  (reset! ui-workspace [:home])
+  (swap! state update-in [:db :decks] dissoc deck-id)
+  (->> @state :db :decks (where :deck-id deck-id) (map (fn [d]
+    (swap! state update-in [:db :decks] dissoc (d :id)))))
+  (->> @state :db :fields (where :deck-id deck-id) (map (fn [d]
+    (swap! state update-in [:db :fields] dissoc (d :id)))))
+  (->> @state :db :cards (where :deck-id deck-id) (map (fn [d]
+    (swap! state update-in [:db :cards] dissoc (d :id)))))
+  )
 
 
 (defmethod handle :new-deck
