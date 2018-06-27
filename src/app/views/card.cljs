@@ -7,7 +7,7 @@
 (def all-cards (r/cursor state [:db :cards]))
 (def all-decks (r/cursor state [:db :decks]))
 (def all-fields (r/cursor state [:db :fields]))
-(def remarkable (js/Remarkable. #js {:html true}))
+(def remarkable (js/Remarkable. #js {:html true :breaks true}))
 
 ;; TODO: Rename this?
 (defn render-card [card template deck-fields]
