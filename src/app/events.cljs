@@ -81,6 +81,12 @@
   (add-record! :cards card))
 
 
+(defmethod handle :delete-card
+  [[_ card-id]]
+
+  (swap! state update-in [:db :cards] dissoc card-id))
+
+
 (defmethod handle :new-note
   [_]
 

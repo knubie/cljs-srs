@@ -17,7 +17,7 @@
 ;; If you get one wrong, move it to the back of the list.
 (def review-queue [])
 
-(defn foobar [card forgot remembered]
+(defn foobar [card forgot remembered delete]
   (r/with-let [current-side (r/atom 1)
                first-side?  (r/atom false)
                last-side?   (r/atom false)
@@ -42,7 +42,9 @@
 
       [:<>
        [:div
-        [render-card card (nth sides (- @current-side 1)) deck-fields]]
+        [render-card card (nth sides (- @current-side 1)) deck-fields]
+        [ui/button "Delete" delete]
+        ]
        (if @last-side?
          [:div [ui/button "Forgot" #(do (reset! current-side 1)
                                         (forgot))]
@@ -76,7 +78,10 @@
 
       (if due-card
         [foobar due-card
+         ;;TODO: Why do these need to be passed in?
          #(do (dispatch [:review-card {:card-id (due-card :id) :remembered? false}])
               (swap! due-slot inc))
-         #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])]
+         #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])
+         #(dispatch [:delete-card (due-card :id)])
+         ]
         [:div "No Cards to learn!"]))))
