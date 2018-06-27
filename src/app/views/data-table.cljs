@@ -55,18 +55,29 @@
     ;[:div {:on-mouse-enter #(reset! hover? true)
            ;:on-mouse-leave #(reset! hover? false)}
 
-(defn text-edit [{:keys [text on-save]}]
+(defn text-edit [{:keys [text width on-save]}]
   (r/with-let [save #(let [v (-> % str clojure.string/trim)]
                        (if-not (empty? v) (on-save v)))]
 
     [:div {:content-editable true
            :on-blur #(-> % .-target .-textContent save)
            :on-key-down #(case (.-which %)
-                           kbd/enter  (-> % .-target .blur)
+                           ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
                            nil)
            :style {:-webkit-user-modify 'read-write-plaintext-only
-                   :outline 0}}
+                   :outline 0
+                   :display "felx"
+                   :padding      "5px 8px 6px"
+                   :border-right border-weak
+                   :border-radius "3px"
+                   :width (max 240 width)
+                   :white-space "pre-wrap"
+                   :word-break "break-word"
+                   :-webkit-line-break "after-white-space"
+                   :box-shadow "rgba(84, 70, 35, 0.3) 0px 6px 20px, rgba(84, 70, 35, 0.14) 0px 1px 3px, rgba(0, 0, 0, 0.08) 0px 0px 1px"
+                   }
+           }
      text]))
 
 (def table-cell-text-edit
@@ -89,19 +100,21 @@
 (defmethod table-cell "text" [field record width]
   (r/with-let [editing? (r/atom false)]
 
-    [:div {:key (field :id)
-           :on-click #(reset! editing? true)
-           :style (merge styles/table-cell {:width width})}
 
      (if @editing?
        [table-cell-text-edit {:text (-> record :fields ((field :id)))
+                              :width width
                               :on-save #(do
                                 (dispatch [:edit-card-field {
                                   :card-id     (record :id)
                                   :field-id    (field :id)
                                   :field-value %}])
                                 (reset! editing? false))}]
-       (-> record :fields ((field :id))))]))
+    [:div {:key (field :id)
+           :on-click #(reset! editing? true)
+           :style (merge styles/table-cell {:width width})}
+      (-> record :fields ((field :id)))]
+       )))
 
 (defmethod table-cell "image" [field record width]
   [:> js/antd.Popover {:placement "bottom"
