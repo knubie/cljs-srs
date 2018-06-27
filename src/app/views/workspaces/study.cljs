@@ -19,17 +19,26 @@
 
 (defn foobar [card forgot remembered]
   (r/with-let [current-side (r/atom 1)
+               first-side?  (r/atom false)
                last-side?   (r/atom false)
+               prev-side    #(swap! current-side dec)
                next-side    #(swap! current-side inc)
                handler      #(case (.-which %)
                               kbd/space (if @last-side? (remembered) (next-side))
+                              kbd/left-arrow (if-not @first-side? (prev-side))
+                              kbd/right-arrow (if-not @last-side? (next-side))
+                              kbd/r (let [audio (aget (.getElementsByTagName js/document "audio") 0)]
+                                      (aset audio "currentTime" 0)
+                                      (.play audio))
                               nil)
                _ (js/document.addEventListener "keydown" handler)]
 
     (let [deck @(r/cursor state [:db :decks (card :deck-id)])
           deck-fields (->> @all-fields (where :deck-id (card :deck-id)))
           sides (-> deck :template (str/split #"---"))
-          _ (reset! last-side? (= @current-side (count sides)))]
+          _ (reset! last-side? (= @current-side (count sides)))
+          _ (reset! first-side? (= @current-side 1))
+          ]
 
       [:<>
        [:div
