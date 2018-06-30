@@ -56,8 +56,7 @@
            ;:on-mouse-leave #(reset! hover? false)}
 
 (defn text-edit [{:keys [text width on-save]}]
-  (r/with-let [save #(let [v (-> % str clojure.string/trim)]
-                       (if-not (empty? v) (on-save v)))]
+  (r/with-let [save #(-> % str clojure.string/trim on-save)]
 
     [:div {:content-editable true
            :on-blur #(-> % .-target .-textContent save)
@@ -67,7 +66,13 @@
                            nil)
            :style {:-webkit-user-modify 'read-write-plaintext-only
                    :outline 0
+                   :position "absolute"
+                   :top 0
+                   :left 0
+                   :bottom 0
+                   :z-index 9
                    :display "felx"
+                   :background-color "#FFFFFF"
                    :padding      "5px 8px 6px"
                    :border-right border-weak
                    :border-radius "3px"
@@ -102,6 +107,8 @@
 
 
      (if @editing?
+       ;; The width + 1 is for the 1px border
+       [:div {:style {:width (+ width 4) :position "relative"}}
        [table-cell-text-edit {:text (-> record :fields ((field :id)))
                               :width width
                               :on-save #(do
@@ -110,6 +117,7 @@
                                   :field-id    (field :id)
                                   :field-value %}])
                                 (reset! editing? false))}]
+       ]
     [:div {:key (field :id)
            :on-click #(reset! editing? true)
            :style (merge styles/table-cell {:width width})}
@@ -152,6 +160,7 @@
            :style (merge styles/table-cell {:width width})}
 
        [:audio {:src (-> record :fields ((field :id)))
+                :style {:width 70}
                 :controls true}]]])
 
 
