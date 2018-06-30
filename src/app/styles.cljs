@@ -71,8 +71,11 @@
   :width        (/ (- 900 32) field-count)})
 
 (def table-cell {
-  :display     'flex
-  :align-items 'center
+  :position     "relative"
+  :display      "flex"
+  :align-items  "center"
+  :white-space  "nowrap"
+  :overflow     "hidden"
   :padding      "5px 8px 6px"
   :border-right border-weak
   :cursor       'pointer})
