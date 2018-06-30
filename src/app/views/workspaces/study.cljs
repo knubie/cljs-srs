@@ -67,9 +67,9 @@
 
     (if due-card
       [foobar due-card
-       #(dispatch [:review-card {:card-id (due-card :id) :remembered? false}])
-       #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])
-       #(dispatch [:delete-card (due-card :id)])]
+       #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? false}])
+       #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
+       #(dispatch [:db/delete-card (due-card :id)])]
       ;; TODO: Show hint that there are x number of unlearned cards.
       [:div "No Cards to study!"])))
 
@@ -86,7 +86,6 @@
         [foobar due-card
          ;;TODO: Why do these need to be passed in?
          #(swap! due-slot inc)
-         #(dispatch [:review-card {:card-id (due-card :id) :remembered? true}])
-         #(dispatch [:delete-card (due-card :id)])
-         ]
+         #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
+         #(dispatch [:db/delete-card (due-card :id)])]
         [:div "No Cards to learn!"]))))

@@ -11,7 +11,7 @@
 
     [:div {:content-editable true
            :suppress-content-editable-warning true
-           :on-blur #(dispatch [:edit-deck-template
+           :on-blur #(dispatch [:db/edit-deck-template
                                  {:deck-id deck-id
                                   :template (-> % .-target .-textContent)}])
            :style {:outline 0

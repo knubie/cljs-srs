@@ -58,7 +58,7 @@
                       :width nil
                       :footer nil
                       :closable false
-                      :onCancel #(dispatch [:close-modal])}
+                      :onCancel #(dispatch [:ui/close-modal])}
     (if (boolean (@modal :card-id))
       [:div
        [:div {:style {:height 45

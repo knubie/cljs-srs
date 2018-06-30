@@ -18,7 +18,7 @@
                :endDrag (fn [props monitor component]
                           (js/console.log "end-drag")
                           (if (.didDrop monitor)
-                            (dispatch [:nest-deck
+                            (dispatch [:db/nest-deck
                                        (keyword (.-deckId props))
                                        (keyword (.-deckId (.getDropResult monitor)))])
 
@@ -77,7 +77,7 @@
         (for [[id child-deck] child-decks] ^{:key (child-deck :id)}
          [deck-item {:deck-id (:id child-deck)
                      :depth (+ depth 1)
-                     :on-click #(dispatch [:select-deck (child-deck :id)])}])]))))))
+                     :on-click #(dispatch [:ui/select-deck (child-deck :id)])}])]))))))
 
 (def deck-item
   (dnd/as-drag-source-and-drop-target unwrapped-deck-item deck-dnd-opts))

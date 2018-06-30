@@ -23,7 +23,7 @@
       [:div {:key (field :id)
              :content-editable true
              :suppress-content-editable-warning true
-             :on-blur #(dispatch [:edit-field
+             :on-blur #(dispatch [:db/edit-field
                (assoc field :name (-> % .-target .-textContent))])
              :style (styles/table-field-column (+ meta-data-count (count fields)))}
 
@@ -40,9 +40,9 @@
  
    ;; Add Field
 
-   [:div {:on-click #(dispatch [:add-field {:deck-id deck-id
-                                            :name "New Image Field"
-                                            :type "image"}])
+   [:div {:on-click #(dispatch [:db/add-field {:deck-id deck-id
+                                               :name "New Image Field"
+                                               :type "image"}])
           :style {:display 'flex
                   :align-items 'center
                   :justify-content 'center
@@ -112,7 +112,7 @@
        [table-cell-text-edit {:text (-> record :fields ((field :id)))
                               :width width
                               :on-save #(do
-                                (dispatch [:edit-card-field {
+                                (dispatch [:db/edit-card-field {
                                   :card-id     (record :id)
                                   :field-id    (field :id)
                                   :field-value %}])
@@ -132,7 +132,7 @@
                          [image-upload
                            {:dir (record :deck-id)
                             :on-upload #(dispatch
-                              [:edit-card-field {
+                              [:db/edit-card-field {
                                 :card-id     (record :id)
                                 :field-id    (field :id)
                                 :field-value (js/encodeURI %)}])}])}
@@ -151,7 +151,7 @@
                          [image-upload
                            {:dir (record :deck-id)
                             :on-upload #(dispatch
-                              [:edit-card-field {
+                              [:db/edit-card-field {
                                 :card-id     (record :id)
                                 :field-id    (field :id)
                                 :field-value (js/encodeURI %)}])}])}
@@ -176,7 +176,7 @@
 
      (if @hover?
        [:div {:style styles/pop-out-button
-              :on-click #(dispatch [:set-modal (record :id)])}
+              :on-click #(dispatch [:ui/set-modal (record :id)])}
         [icons/popup 10 10] "Preview"])
 
      (for [field fields] ^{:key (:id field)}
@@ -206,7 +206,6 @@
 
 
 (defn table-new-record [deck-id fields]
-  [:div {:on-click #(dispatch [:add-empty-card deck-id fields])
          :style {:display 'flex
                  :align-items 'center
                  :color weak-color
@@ -215,6 +214,7 @@
                  :padding-left 8
                  :padding-bottom 2
                  :cursor 'pointer}}
+  [:div {:on-click #(dispatch [:db/add-empty-card deck-id fields])
    [icons/plus 18 18 4] "Add a Card"])
 
 

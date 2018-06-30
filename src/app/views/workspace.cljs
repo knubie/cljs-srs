@@ -38,7 +38,7 @@
       
       [:div {:content-editable true
              :suppress-content-editable-warning true
-             :on-blur #(dispatch [:edit-deck-name {
+             :on-blur #(dispatch [:db/edit-deck-name {
                                   :deck-id deck-id
                                   :name    (-> % .-target .-textContent)}])
              :style (conj styles/h1
@@ -49,7 +49,7 @@
      [ui/button [:<> [icons/pencil 14 14 5] "Edit Template"] #(dispatch [:ui/edit-deck-template deck-id])]
      [ui/button "Review" #(dispatch [:ui/review deck-id])]
      [ui/button "Learn" #(dispatch [:ui/learn deck-id])]
-     [ui/button "Delete" #(dispatch [:delete-deck deck-id])]
+     [ui/button "Delete" #(dispatch [:db/delete-deck deck-id])]
 
      [data-table deck-fields cards deck-id]]))
 

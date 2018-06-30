@@ -32,7 +32,7 @@
 ;; interval is days
 (s/def ::review     (s/keys :req-un [::date ::due ::interval ::remembered?]))
 (s/def ::reviews    (s/coll-of ::review :kind vector?))
-(s/def :card/fields (s/map-of ::id string?))
+(s/def :card/fields (s/map-of ::id string?)) ;; TODO: weird namespace
 (s/def ::card       (s/keys :req-un [::id ::deck-id ::reviews :card/fields ::learning?]
                             :opt-un [::due]))
 
