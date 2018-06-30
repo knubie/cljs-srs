@@ -118,7 +118,7 @@
 
   (let [deck-id (add-record! :decks
     {:name     "New Deck"
-     :template "#{{Front}}\n\n---\n\n#{{Back}}"})]
+     :template "# {{Front}}\n\n---\n\n# {{Back}}"})]
 
     (add-record! :fields
       {:deck-id deck-id :name "Front" :type "text"})
@@ -165,7 +165,6 @@
 (defmethod handle :edit-card-field
   [[_ {:keys [card-id field-id field-value]}]]
 
-  (js/console.log (str "Saving: " field-value))
   (swap! state assoc-in [:db :cards card-id :fields field-id] field-value))
 
 
