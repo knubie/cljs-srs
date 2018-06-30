@@ -28,14 +28,29 @@
         next-interval (* last-interval default-ease)
         next-due      (t/plus last-due (t/days (Math/round next-interval)))]
 
-   (-> card
-    (assoc :due next-due)
-    (assoc :learning? false)
-    (update-in [:reviews]
-      conj {:date (t/today)
-            :due next-due
-            :interval next-interval
-            :remembered? true})))) 
+    (if (= (t/today) (:date last-review))
+      card
+
+      (if (and (not (nil? last-review))
+               (not (:remembered? last-review))
+               (:learning? card))
+
+        (-> card
+          (assoc :learning? false))
+
+        (-> card
+         (assoc :due next-due)
+         (assoc :learning? false)
+         (update-in [:reviews]
+           conj {:date (t/today)
+                 :due next-due
+                 :interval next-interval
+                 :remembered? true})))
+      )
+
+
+  )
+) 
 
 ;;TODO: Test this works with no reviews
 (defn forget [card]

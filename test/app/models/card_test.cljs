@@ -19,6 +19,7 @@
 ;; two reviews -> (due - last-review) * int-mod-of-last-review
 ;; two reviews -> 
 
+(defn yesterday [] (-> (today) (minus (days 1))))
 (defn tomorrow [] (-> (today) (plus (days 1))))
 
 (def test-card
@@ -36,8 +37,9 @@
 ;;
 ;; TODO: Refactor with `are` macro.
 
+;; TODO: Write test that you can't remember before due date
 (deftest test-remember-with-no-reviews
-  (let [card test-card]
+  (let [card (assoc test-card :learning? true)]
 
     (is (= (-> card remember :due)
            (tomorrow))
@@ -61,25 +63,35 @@
 
 (deftest test-remember-with-one-review
   (let [card (assoc test-card :reviews
-                    [{:date (today)
-                      :due (tomorrow)
+                    [{:date (yesterday)
+                      :due (today)
                       :interval 1
                       :remembered? true}])]
     
     (is (= (-> card remember :due)
-           (plus (tomorrow) (days 2)))
+           (plus (today) (days 2)))
 
           "Remembering a card with one review will make the due date equal
-           to (due - last-review) * interval")
+           to (:due last-review) +  (ease * interval)")
     
     (is (= (-> card remember :reviews last)
              {:date (today)
-              :due (plus (tomorrow) (days 2))
+              :due (plus (today) (days 2))
               :interval 2
               :remembered? true})
 
           "Remembering a card will add a new review history item for today")))
 
+
+(deftest remembering-before-due-date
+  (let [card (assoc test-card :reviews
+                    [{:date (today)
+                      :due (tomorrow)
+                      :interval 1
+                      :remembered? true}])]
+
+    (is (= (-> card remember :reviews count) 1)
+        "Remembering a card before its due date should do nothing.")))
 
 (deftest test-remember-with-two-reviews
   (let [two-days-after-tomorrow (plus (tomorrow) (days 2)) 
@@ -104,7 +116,7 @@
                  (plus (days 2))
                  (plus (days 4))))
 
-          "Something about two reviews")
+          "Remembering a card will make it due on the appropriate day.")
     
     (is (= (-> card remember :reviews last)
              {:date (today)
@@ -118,10 +130,14 @@
           "Remembering a card will add a new review history item for today")))
 
 
-(deftest test-remember-with-two-reviews-and-one-failed
+(deftest test-remember-with-one-review-and-one-failed
   (let [two-days-after-tomorrow (plus (tomorrow) (days 2)) 
         card (-> test-card
                  (assoc :due two-days-after-tomorrow)
+                 (assoc :learning? true)
+                 (assoc :due (-> (today)
+                                 (plus (days 1))
+                                 (plus (days 1))))
                  (assoc :reviews
                     [{:date (today)
                       :due (tomorrow)
@@ -135,24 +151,17 @@
                       :interval 1
                       :remembered? false}]))]
     
+    (is (= (-> card remember :reviews count) 2)
+        "Remembering a card that has been forgotten today, should not add
+         a review record.")
+
     (is (= (-> card remember :due)
              (-> (today)
                  (plus (days 1))
-                 (plus (days 1))
-                 (plus (days 2))))
+                 (plus (days 1))))
 
-          "Something about two reviews")
-    
-    (is (= (-> card remember :reviews last)
-             {:date (today)
-              :due (-> (today)
-                       (plus (days 1))
-                       (plus (days 1))
-                       (plus (days 2)))
-              :interval 2
-              :remembered? true})
-
-          "Remembering a card will add a new review history item for today")))
+          "Remembering a card that has been forgotten today, should not
+           increase the due date.")))
 
 
 ;; -- Test Forget ----------------------------------------------------------
