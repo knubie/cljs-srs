@@ -124,10 +124,21 @@ code {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+.ant-modal-body {
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
+}
+
 .ant-modal {
+  /*all: inherit;*/
   transform-origin: 50% 50% 0px !important;
   position: absolute !important;
   max-width: 850px;
   left: 72px;
   right: 72px;
+
+  color: inherit;
+  font-size: inherit;
+  font-family: inherit;
 }
