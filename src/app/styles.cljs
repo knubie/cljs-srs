@@ -70,6 +70,16 @@
   :border-right border-weak
   :width        (/ (- 900 32) field-count)})
 
+(def table-new-record {
+  :display 'flex
+  :align-items 'center
+  :color weak-color
+  :border-bottom border-weak
+  :height 32
+  :padding-left 8
+  :padding-bottom 2
+  :cursor 'pointer})
+
 (def table-cell {
   :position     "relative"
   :display      "flex"
@@ -79,6 +89,27 @@
   :padding      "5px 8px 6px"
   :border-right border-weak
   :cursor       'pointer})
+
+(defn editing-table-cell [width] {
+  :-webkit-user-modify 'read-write-plaintext-only
+  :outline 0
+  :position "absolute"
+  :top 0
+  :left 0
+  :z-index 9
+  :display "felx"
+  :background-color "#FFFFFF"
+  :padding      "5px 8px 6px"
+  :border-right border-weak
+  :border-radius "3px"
+  :width (max 240 width)
+  :white-space "pre-wrap"
+  :word-break "break-word"
+  :-webkit-line-break "after-white-space"
+  :box-shadow "rgba(84, 70, 35, 0.3) 0px 6px 20px,
+               rgba(84, 70, 35, 0.14) 0px 1px 3px,
+               rgba(0, 0, 0, 0.08) 0px 0px 1px"
+})
 
 (def add-field {
   :display 'flex

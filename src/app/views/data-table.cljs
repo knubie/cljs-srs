@@ -59,30 +59,12 @@
   (r/with-let [save #(-> % str clojure.string/trim on-save)]
 
     [:div {:content-editable true
+           :style (styles/editing-table-cell width)
            :on-blur #(-> % .-target .-textContent save)
            :on-key-down #(case (.-which %)
                            ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
-                           nil)
-           :style {:-webkit-user-modify 'read-write-plaintext-only
-                   :outline 0
-                   :position "absolute"
-                   :top 0
-                   :left 0
-                   :bottom 0
-                   :z-index 9
-                   :display "felx"
-                   :background-color "#FFFFFF"
-                   :padding      "5px 8px 6px"
-                   :border-right border-weak
-                   :border-radius "3px"
-                   :width (max 240 width)
-                   :white-space "pre-wrap"
-                   :word-break "break-word"
-                   :-webkit-line-break "after-white-space"
-                   :box-shadow "rgba(84, 70, 35, 0.3) 0px 6px 20px, rgba(84, 70, 35, 0.14) 0px 1px 3px, rgba(0, 0, 0, 0.08) 0px 0px 1px"
-                   }
-           }
+                           nil)}
      text]))
 
 (def table-cell-text-edit
@@ -105,10 +87,9 @@
 (defmethod table-cell "text" [field record width]
   (r/with-let [editing? (r/atom false)]
 
-
-     (if @editing?
-       ;; The width + 1 is for the 1px border
-       [:div {:style {:width (+ width 4) :position "relative"}}
+    (if @editing?
+      ;; The width + 1 is for the 1px border
+      [:div {:style {:width (+ width 4) :position "relative"}}
        [table-cell-text-edit {:text (-> record :fields ((field :id)))
                               :width width
                               :on-save #(do
@@ -116,13 +97,11 @@
                                   :card-id     (record :id)
                                   :field-id    (field :id)
                                   :field-value %}])
-                                (reset! editing? false))}]
-       ]
-    [:div {:key (field :id)
-           :on-click #(reset! editing? true)
-           :style (merge styles/table-cell {:width width})}
-      (-> record :fields ((field :id)))]
-       )))
+                                (reset! editing? false))}]]
+      [:div {:key (field :id)
+             :on-click #(reset! editing? true)
+             :style (merge styles/table-cell {:width width})}
+        (-> record :fields ((field :id)))])))
 
 (defmethod table-cell "image" [field record width]
   [:> js/antd.Popover {:placement "bottom"
@@ -206,15 +185,8 @@
 
 
 (defn table-new-record [deck-id fields]
-         :style {:display 'flex
-                 :align-items 'center
-                 :color weak-color
-                 :border-bottom border-weak
-                 :height 32
-                 :padding-left 8
-                 :padding-bottom 2
-                 :cursor 'pointer}}
   [:div {:on-click #(dispatch [:db/add-empty-card deck-id fields])
+         :style styles/table-new-record}
    [icons/plus 18 18 4] "Add a Card"])
 
 
