@@ -60,7 +60,7 @@
 (defonce ui-workspace (r/cursor state [:ui :workspace]))
 (defonce all-decks    (r/cursor state [:db :decks]))
 (defonce all-notes    (r/cursor state [:db :notes]))
-(defonce all-cards    (r/cursor state [:db :notes]))
+(defonce all-cards    (r/cursor state [:db :cards]))
 (defonce all-fields   (r/cursor state [:db :fields]))
 (defonce modal        (r/cursor state [:ui :modal]))
 

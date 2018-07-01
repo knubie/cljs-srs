@@ -7,4 +7,5 @@ resources/public/entypo
 .cljs_rhino_repl
 target
 .lein-failures
+.lein-repl-history
 figwheel_server.log
