@@ -31,7 +31,11 @@
 (defn deck [deck-id]
   (let [deck        @(r/cursor state [:db :decks deck-id])
         deck-fields (->> @all-fields (where :deck-id deck-id) vals)
-        cards       (->> @all-cards  (where :deck-id deck-id) vals)]
+        cards       (->> @all-cards  (where :deck-id deck-id) vals)
+        learned-cards (->> cards (filter #(-> % :reviews count (not= 0))) (sort-by :due))
+        unlearned-cards (->> cards (filter #(-> % :reviews count (= 0))))]
+
+    (js/console.log "found decks")
 
     [:<>
      [:div {:style {:margin-bottom "0.5em"}}
@@ -51,7 +55,8 @@
      [ui/button "Learn" #(dispatch [:ui/learn deck-id])]
      [ui/button "Delete" #(dispatch [:db/delete-deck deck-id])]
 
-     [data-table deck-fields cards deck-id]]))
+     [data-table deck-fields (concat unlearned-cards learned-cards) deck-id]
+     ]))
 
 
 (defn home []
