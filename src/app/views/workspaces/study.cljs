@@ -6,11 +6,8 @@
             [app.views.util.keyboard :as kbd]
             [app.views.card  :refer [render-card]]
             [app.styles     :as styles]
-            [app.db         :refer [state ui-workspace where to-review to-learn]]
+            [app.db         :as db
             [app.events     :refer [dispatch]]))
-
-(def all-fields (r/cursor state [:db :fields]))
-(def all-cards (r/cursor state [:db :cards]))
 
 ;; Start with an ordered list.
 ;; If you get one right, remove it from the list.
@@ -36,56 +33,56 @@
                               nil)
                _ (js/document.addEventListener "keydown" handler)]
 
-    (let [deck @(r/cursor state [:db :decks (card :deck-id)])
-          deck-fields (->> @all-fields (where :deck-id (card :deck-id)))
-          sides (-> deck :template (str/split #"---"))
+    (let [deck-id (:deck-id card)
+          deck            (@db/all-decks deck-id)
+          deck-fields     (r/track db/fields-for-deck deck-id)
+          sides (-> @deck :template (str/split #"---"))
           _ (reset! last-side? (= @current-side (count sides)))
-          _ (reset! first-side? (= @current-side 1))
-          ]
+          _ (reset! first-side? (= @current-side 1))]
 
       [:<>
-       [:div
-        [render-card card (nth sides (- @current-side 1)) deck-fields] ]
+       [render-card card (nth sides (- @current-side 1)) @deck-fields]
+       [ui/button "Delete" #(do (reset! current-side 1)
+                                (delete))]
        (if @last-side?
-         [:<> [ui/button "Delete" #(do (reset! current-side 1)
-                                       (delete))]
-              [ui/button "Forgot" #(do (reset! current-side 1)
+         [:<> [ui/button "Forgot" #(do (reset! current-side 1)
                                        (forgot))]
               [ui/button "Remembered" #(do (reset! current-side 1)
                                            (remembered))]]
-         [:<> [ui/button "Delete" #(do (reset! current-side 1)
-                                       (delete))]
-              [ui/button "Next" next-side]])])
+         [:<> [ui/button "Next" next-side]])])
 
     (finally (js/document.removeEventListener "keydown" handler))))
 
 
 (defn review [deck-id]
-  ;; Set up review queue here.
-  (let [due-cards (->> @all-cards (where :deck-id deck-id) to-review)
-        due-card (first due-cards)]
+  (let [cards     (r/track db/cards-for-deck deck-id)
+        due-cards (r/track db/to-review @cards)
+        due-card  (first @due-cards)]
 
-    (if due-card
-      [foobar due-card
-       #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? false}])
-       #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
-       #(dispatch [:db/delete-card (due-card :id)])]
-      ;; TODO: Show hint that there are x number of unlearned cards.
-      [:div "No Cards to study!"])))
+    [:div {:style styles/workspace-content}
+     (if due-card
+       [foobar due-card
+        #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? false}])
+        #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
+        #(dispatch [:db/delete-card (due-card :id)])]
+       ;; TODO: Show hint that there are x number of unlearned cards.
+       [:div "No Cards to study!"])]))
 
 (defn learn [deck-id]
   ;; Set up review queue here.
   (r/with-let [due-slot (r/atom 0)]
 
-    (let [due-cards (->> @all-cards (where :deck-id deck-id) to-learn)
-          _ (if (>= @due-slot (count due-cards))
+    (let [cards     (r/track db/cards-for-deck deck-id)
+          due-cards (r/track db/to-learn @cards)
+          _ (if (>= @due-slot (count @due-cards))
                     (reset! due-slot 0))
-          due-card (nth due-cards @due-slot)]
+          due-card (nth @due-cards @due-slot)]
 
-      (if due-card
-        [foobar due-card
-         ;;TODO: Why do these need to be passed in?
-         #(swap! due-slot inc)
-         #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
-         #(dispatch [:db/delete-card (due-card :id)])]
-        [:div "No Cards to learn!"]))))
+      [:div {:style styles/workspace-content}
+       (if due-card
+         [foobar due-card
+          ;;TODO: Why do these need to be passed in?
+          #(swap! due-slot inc)
+          #(dispatch [:db/review-card {:card-id (due-card :id) :remembered? true}])
+          #(dispatch [:db/delete-card (due-card :id)])]
+         [:div "No Cards to learn!"])])))

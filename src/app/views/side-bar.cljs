@@ -1,6 +1,6 @@
 (ns app.views.side-bar
   (:require [reagent.core    :as r]
-            [app.db          :refer [state all-decks all-notes where]]
+            [app.db          :as db]
             [app.events      :refer [dispatch]]
             [app.views.side-bar.deck-item :refer [deck-item]]
             [app.views.side-bar.section :refer [section]]
@@ -33,11 +33,12 @@
                 name]]))
 
 (defn side-bar []
-  (let [top-level-decks (->> @all-decks (where :deck-id nil))]
+  (let [top-level-decks (->> @db/all-decks (db/where :deck-id nil)
+                                           (db/where :trashed? nil))]
     [:div {:style styles/side-bar}
      [:div
       [section {:title "Notes"}
-       (for [[id note] @all-notes] ^{:key (note :id)}
+       (for [[id note] @db/all-notes] ^{:key (note :id)}
          [side-bar-section-item {:name (note :name)
                                  :icon icons/doc-text
                                  :on-click #(dispatch [:ui/select-note (note :id)])}])

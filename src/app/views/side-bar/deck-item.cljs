@@ -1,7 +1,7 @@
 (ns app.views.side-bar.deck-item
   (:require [reagent.core    :as r]
             [app.dnd         :as dnd]
-            [app.db          :refer [all-decks where]]
+            [app.db          :as db
             [app.events      :refer [dispatch]]
             [app.views.icons :as icons]))
 
@@ -44,10 +44,11 @@
 (defn unwrapped-deck-item [props]
   (r/with-let [background (r/atom "")]
 
-    (let [deck ((keyword (:deckId props)) @all-decks)
-          child-decks (->> @all-decks (where :deck-id (:id deck)))
-          depth (:depth props)
-          on-click (:onClick props)
+    (let [deck-id     (keyword (:deckId props))
+          deck        (deck-id @db/all-decks)
+          child-decks (r/track child-decks-for-deck deck-id)
+          depth       (:depth props)
+          on-click    (:onClick props)
 
           connect-drag-source (:connectDragSource props)
           connect-drop-target (:connectDropTarget props)
@@ -74,7 +75,7 @@
                                   :overflow 'hidden 
                                   :text-overflow 'ellipsis}}
                     (:name deck)]]
-        (for [[id child-deck] child-decks] ^{:key (child-deck :id)}
+        (for [child-deck @child-decks] ^{:key (child-deck :id)}
          [deck-item {:deck-id (:id child-deck)
                      :depth (+ depth 1)
                      :on-click #(dispatch [:ui/select-deck (child-deck :id)])}])]))))))

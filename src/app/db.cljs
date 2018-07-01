@@ -25,7 +25,7 @@
 (s/def ::type #{"text" "image" "audio"})
 
 (s/def ::deck   (s/keys :req-un [::id ::name ::template]
-                        :opt-un [::deck-id]))
+                        :opt-un [::deck-id ::trashed?]))
 (s/def ::note   (s/keys :req-un [::id ::name]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 
@@ -156,6 +156,7 @@
 
 ;; TODO: Test me!
 ;; TODO: Accept hash of key matcher pairs
+;; TODO: Spec the input (map only)
 (defn where [key matcher collection]
   (->> collection
        (filter #(-> % second key (= matcher))) ;; `second` is used to grab
@@ -165,22 +166,52 @@
   (select-keys collection keys))
 
 (defn find-one [key matcher collection]
-  (->> collection vals
+  (->> collection
+       (#(if (map? %) (vals %) %))
        (filter #(-> % key (= matcher)))
        first))
 
 ;; TODO: Test me
+;; TODO: Spec the input (map only)
 (defn to-review [collection]
-  (->> collection vals
+  (->> collection
+       (#(if (map? %) (vals %) %))
        ;; TODO: make this more efficient, transducers?
        ;; TODO: Test with cards that have nil due
        (remove #(nil? (% :due)))
        (filter #(or (cljs-time/before? (% :due) (cljs-time/today))
                     (cljs-time/equal?  (% :due) (cljs-time/today))))))
 
-;(def to-learn (partial where :learning? true))
+;; TODO: Spec the input (map only)
 (defn to-learn [collection]
   (->> collection (where :learning? true) vals))
+
+
+(defn child-decks-for-deck [deck-id]
+  (->> @all-decks (where :deck-id deck-id)) vals)
+
+
+(defn fields-for-deck [deck-id]
+  (->> @all-fields (where :deck-id deck-id) vals))
+
+
+(defn cards-for-deck [deck-id]
+  (do (js/console.log "cards-for-deck")
+  (->> @all-cards (where :deck-id deck-id) vals)))
+
+
+(defn learned-cards [cards]
+  (->> cards (filter #(-> % :reviews count (not= 0))) (sort-by :due)))
+
+
+(defn learned-today [cards]
+  (->> cards
+       (filter #(and (-> % :reviews count (= 1))
+                     (-> % :reviews last :date (= (cljs-time/today)))))))
+
+(defn unlearned-cards [cards]
+  (do (js/console.log "unlearned-cards")
+  (->> cards (filter #(-> % :reviews count (= 0))))))
 
 ;; -- Persistence ----------------------------------------------------------
 ;;
