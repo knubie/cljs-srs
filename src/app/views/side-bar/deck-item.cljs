@@ -1,7 +1,7 @@
 (ns app.views.side-bar.deck-item
   (:require [reagent.core    :as r]
             [app.dnd         :as dnd]
-            [app.db          :as db
+            [app.db          :as db]
             [app.events      :refer [dispatch]]
             [app.views.icons :as icons]))
 
@@ -44,9 +44,14 @@
 (defn unwrapped-deck-item [props]
   (r/with-let [background (r/atom "")]
 
+    ;(let [deck-id     (keyword (:deckId props))
+          ;deck        (deck-id @db/all-decks)
+          ;child-decks (r/track child-decks-for-deck deck-id)
+          ;depth       (:depth props)
+          ;on-click    (:onClick props)
     (let [deck-id     (keyword (:deckId props))
           deck        (deck-id @db/all-decks)
-          child-decks (r/track child-decks-for-deck deck-id)
+          child-decks (r/track db/child-decks-for-deck deck-id)
           depth       (:depth props)
           on-click    (:onClick props)
 

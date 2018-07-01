@@ -182,13 +182,12 @@
        (filter #(or (cljs-time/before? (% :due) (cljs-time/today))
                     (cljs-time/equal?  (% :due) (cljs-time/today))))))
 
-;; TODO: Spec the input (map only)
-(defn to-learn [collection]
-  (->> collection (where :learning? true) vals))
+(defn to-learn [cards]
+  (->> cards (filter :learning?)))
 
 
 (defn child-decks-for-deck [deck-id]
-  (->> @all-decks (where :deck-id deck-id)) vals)
+  (->> @all-decks (where :deck-id deck-id) vals))
 
 
 (defn fields-for-deck [deck-id]

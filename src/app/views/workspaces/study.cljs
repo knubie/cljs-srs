@@ -6,7 +6,7 @@
             [app.views.util.keyboard :as kbd]
             [app.views.card  :refer [render-card]]
             [app.styles     :as styles]
-            [app.db         :as db
+            [app.db         :as db]
             [app.events     :refer [dispatch]]))
 
 ;; Start with an ordered list.
@@ -36,7 +36,7 @@
     (let [deck-id (:deck-id card)
           deck            (@db/all-decks deck-id)
           deck-fields     (r/track db/fields-for-deck deck-id)
-          sides (-> @deck :template (str/split #"---"))
+          sides (-> deck :template (str/split #"---"))
           _ (reset! last-side? (= @current-side (count sides)))
           _ (reset! first-side? (= @current-side 1))]
 
@@ -49,7 +49,8 @@
                                        (forgot))]
               [ui/button "Remembered" #(do (reset! current-side 1)
                                            (remembered))]]
-         [:<> [ui/button "Next" next-side]])])
+         [:<> [ui/button "Next" next-side]])
+       ])
 
     (finally (js/document.removeEventListener "keydown" handler))))
 

@@ -39,6 +39,16 @@
   :padding "0px 96px 30vh"
 })
 
+(def topbar {
+  :width "100%"
+  :height 45
+  :display "flex"
+  :justify-content "space-between"
+  :align-items "center"
+  :padding "0 12px"
+  :font-size 14
+})
+
 (def table-td {
   :border "1px solid #DEE1E3"
 })

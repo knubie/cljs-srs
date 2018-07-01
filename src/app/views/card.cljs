@@ -12,12 +12,16 @@
 ;; TODO: Rename this?
 (defn render-card [card template deck-fields]
   (let [data (into {}
-    (for [[id field] deck-fields]
-      [(-> field :name keyword)
-       (-> card :fields id)]))]
+              (for [field deck-fields]
+                [(-> field :name keyword)
+                 (-> card :fields ((:id field)))]))
+        furigana (fn [s] (.convert js/kuroshiro s #js{:mode "furigana" :to "hiragana"}))]
 
     [:div {:dangerouslySetInnerHTML {:__html
-      (.render remarkable (-> template (stache/render data)))}}]))
+      (.render remarkable (-> template (stache/render data) 
+                                     
+                                     ;kuroshiro.convert(_, #js{mode: "furigana", to: "hiragana"});
+                                     ))}}]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
