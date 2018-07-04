@@ -2,7 +2,7 @@
   (:require [clojure.string             :as str] 
             [reagent.core               :as r]
             [app.views.workspaces.study :as study]
-            [app.views.workspaces.edit  :refer [edit-template]]
+            [app.views.workspaces.edit  :refer [edit-template edit-note]]
             [app.views.workspaces.deck  :refer [deck-workspace]]
             [app.views.topbar           :as topbar]
             [app.styles                 :as styles]
@@ -27,7 +27,10 @@
    (case (first @db/ui-workspace)
      :home  [home]
      ;; TODO: it's not clear what nth is doing here.
-     :note  [note-workspace  (nth @db/ui-workspace 1)]
+     ;:note  [note-workspace  (nth @db/ui-workspace 1)]
+     :note  [:<> [topbar/note (nth @db/ui-workspace 1)]
+                 [note-workspace (nth @db/ui-workspace 1)]]
+     :edit-note [edit-note (nth @db/ui-workspace 1)]
      :deck  [:<> [topbar/deck (nth @db/ui-workspace 1)]
                  [deck-workspace (nth @db/ui-workspace 1)]]
      :edit-deck-template [edit-template (nth @db/ui-workspace 1)]

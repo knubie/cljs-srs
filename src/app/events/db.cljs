@@ -6,6 +6,7 @@
 
 
 (s/def ::card-id     keyword?)
+(s/def ::note-id     keyword?)
 (s/def ::field-id    keyword?)
 (s/def ::field-value string?)
 
@@ -118,6 +119,15 @@
   [[_ {:keys [deck-id template]}]]
 
   (swap! db/state assoc-in [:db :decks deck-id :template] template))
+
+
+(defmethod event-spec :db/edit-note [_]
+  (s/cat :action-name keyword?
+         :params (s/keys :req-un [::note-id :app.db/content])))
+(defmethod handle :db/edit-note
+  [[_ {:keys [note-id content]}]]
+
+  (swap! db/state assoc-in [:db :notes note-id :content] content))
 
 ;; TODO: ---------------------------------------------
 

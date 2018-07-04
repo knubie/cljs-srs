@@ -56,6 +56,7 @@ that queries based on the current day work.
 # Dogfood Req
 - [~] **Edit from study view**
 - [~] **Furigana**
+- [ ] Figure out undoing
 - [x] **Top Bar with progress**
    - [x] Cards reviewed today, cards learned today
 - [ ] Stop storing UI actions in local storage

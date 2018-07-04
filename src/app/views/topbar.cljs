@@ -28,3 +28,22 @@
     [ui/button "Delete" #(dispatch [:db/delete-deck deck-id])]]]
   )
 )
+
+
+(defn note [note-id]
+  (let [note (@db/all-notes note-id)]
+
+  [:div {:style styles/topbar}
+   (str (:name note))
+   [:div
+    [ui/button [:<> [icons/pencil 14 14 5] "Edit Note"]
+               #(dispatch [:ui/edit-note note-id])]
+    ;[ui/button (str "Review " (count @due-cards))
+               ;#(dispatch [:ui/review deck-id])]
+    ;[ui/button (str "Learn " (count @learned-today)
+                    ;" / " (count @unlearned-cards))
+               ;#(dispatch [:ui/learn deck-id])]
+    ;[ui/button "Delete" #(dispatch [:db/delete-deck deck-id])]
+    ]]
+  )
+)

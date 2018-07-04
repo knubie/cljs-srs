@@ -59,3 +59,11 @@
   [[_ deck-id]]
 
   (reset! db/ui-workspace [:edit-deck-template deck-id]))
+
+
+(defmethod event-spec :ui/edit-note [_]
+  (s/cat :action-name keyword? :note-id :app.db/id))
+(defmethod handle :ui/edit-note
+  [[_ note-id]]
+
+  (reset! db/ui-workspace [:edit-note note-id]))

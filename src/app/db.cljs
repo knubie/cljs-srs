@@ -18,6 +18,7 @@
 (s/def ::deck-id  keyword?)
 (s/def ::name     string?)
 (s/def ::template string?)
+(s/def ::content  string?)
 (s/def ::due      inst?)
 (s/def ::interval number?)
 (s/def ::remembered? boolean?)
@@ -26,7 +27,7 @@
 
 (s/def ::deck   (s/keys :req-un [::id ::name ::template]
                         :opt-un [::deck-id ::trashed?]))
-(s/def ::note   (s/keys :req-un [::id ::name]))
+(s/def ::note   (s/keys :req-un [::id ::name ::content]))
 (s/def ::field  (s/keys :req-un [::id ::deck-id ::name ::type]))
 
 ;; interval is days
