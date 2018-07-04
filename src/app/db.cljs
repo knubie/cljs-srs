@@ -195,8 +195,7 @@
 
 
 (defn cards-for-deck [deck-id]
-  (do (js/console.log "cards-for-deck")
-  (->> @all-cards (where :deck-id deck-id) vals)))
+  (->> @all-cards (where :deck-id deck-id) vals))
 
 
 (defn learned-cards [cards]
@@ -209,8 +208,7 @@
                      (-> % :reviews last :date (= (cljs-time/today)))))))
 
 (defn unlearned-cards [cards]
-  (do (js/console.log "unlearned-cards")
-  (->> cards (filter #(-> % :reviews count (= 0))))))
+  (->> cards (filter #(-> % :reviews count (= 0)))))
 
 ;; -- Persistence ----------------------------------------------------------
 ;;

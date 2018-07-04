@@ -46,7 +46,6 @@
                    newer-edn (update-in new-edn [:cards] (fn [cards]
                       (map
                         (fn [card]
-                          (js/console.log save-path)
                           (as-> card c
                             (update-in c [:fields] rename-keys new-field-keys)
 
@@ -63,7 +62,6 @@
                       cards)) )
 
                    ]
-               (js/console.log (clj->js newer-edn))
 
              ))}
   ]
