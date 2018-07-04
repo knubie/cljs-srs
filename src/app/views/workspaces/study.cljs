@@ -44,6 +44,7 @@
        [render-card card (nth sides (- @current-side 1)) @deck-fields]
        [ui/button "Delete" #(do (reset! current-side 1)
                                 (delete))]
+       [ui/button "Edit" #(dispatch [:ui/set-modal (card :id)])]
        (if @last-side?
          [:<> [ui/button "Forgot" #(do (reset! current-side 1)
                                        (forgot))]

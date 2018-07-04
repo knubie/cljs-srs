@@ -11,19 +11,17 @@
 - [ ] Break out data-table into separate files
    - [ ] rename to deck-table
 - [ ] Strip newlines from table columns, etc.
-- [x] Fix the isOver behavior for dragging decks around
 - [ ] Use keywords instead of strings for field type
    - [ ] update src/app/views/data-table
-- [~] Optimize queries
 - [~] Add spec for notes
 - [~] Run time spec checking
    - [x] Check db
    - [ ] Check ui
-   - [ ] specs for events
+   - [x] specs for events
 - [ ] Come up with a system for scopes and queries
    - [ ] When do we return the collections with keys
    - [ ] When do we return the vals?
-- [ ] Write specs for events
+- [x] Write specs for events
 - [ ] Add docstrings to functions
 - [~] Add note#show page
    - [ ] Add ability to edit note
@@ -44,6 +42,8 @@
    - [x] At lease it shouldn't adjust the due date.
 - [ ] What's causing the multiple reviews?
 - [ ] Unable to de-focus empty cell
+- [] Need to write some kind of timing function that updates the db so
+that queries based on the current day work.
 
 # Misc
 - [] Enter/Esc to finish editing field name
@@ -54,12 +54,11 @@
 - [] Sort reviewed by due date
 
 # Dogfood Req
-- [] **Edit from study view**
-- [] **Furigana**
-- [] **Top Bar with progress**
-   - [] Cards reviewed today, cards learned today
+- [~] **Edit from study view**
+- [~] **Furigana**
+- [x] **Top Bar with progress**
+   - [x] Cards reviewed today, cards learned today
 - [ ] Stop storing UI actions in local storage
-- [ ] Edit from card view
 - [x] Delete from card view
 - [ ] Keyboard controls from card view
    - [x] R to replay
@@ -87,6 +86,8 @@
 - [x] Audio on cards
 
 # Launch MVP
+- [ ] Card "Death Point" ie "burned"
+  - No longer shows up once it has been "burned"
 - [ ] Link notes to cards
    - [] Add a "notes" field type
       - Contains a list of note IDs
@@ -101,6 +102,8 @@
    - [x] Due
    - [~] Maturity
       - [] Write maturity function
+- [ ] Card "Death Point" ie "burned"
+  - No longer shows up once it has been "burned"
 - [x] Local storage sync
    - [x] Loads seed data if no localstorage is found.
    - [ ] Improve seed data ( Right now it's all japanese shit. )

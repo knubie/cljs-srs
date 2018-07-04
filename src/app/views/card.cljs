@@ -1,12 +1,10 @@
 (ns app.views.card
   (:require [reagent.core   :as r]
             [app.models.card :refer [formatted-due]]
-            [app.db         :refer [state where find-one]]
+            [app.views.data-table :as table]
+            [app.db         :as db]
             [cljstache.core :as stache]))
 
-(def all-cards (r/cursor state [:db :cards]))
-(def all-decks (r/cursor state [:db :decks]))
-(def all-fields (r/cursor state [:db :fields]))
 (def remarkable (js/Remarkable. #js {:html true :breaks true}))
 
 ;; TODO: Rename this?
@@ -26,14 +24,27 @@
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
   ;; TODO: Use r/track here
-  (let [card (@all-cards card-id)
-        deck (@all-decks (card :deck-id))
-        template (deck :template)
-        deck-fields (->> @all-fields (where :deck-id (card :deck-id)))
+  (let [card        (@db/all-cards card-id)
+        deck-id     (card :deck-id)
+        deck        (@db/all-decks deck-id)
+        template    (deck :template)
+        deck-fields (r/track db/fields-for-deck deck-id)
         data (into {}
-          (for [[id field] deck-fields]
+          (for [field @deck-fields]
             [(-> field :name keyword)
-             (-> card :fields id)]))]
+             (-> card :fields ((field :id)))]))]
 
-    [:div {:dangerouslySetInnerHTML {:__html
-      (.render remarkable (-> template (stache/render data)))}}]))
+    [:<>
+     [:div
+      (for [field @deck-fields]
+        [:div {:style {:display "flex"}}
+         [:div {:style {:width 160}} (field :name)]
+         [table/table-cell field card 300]
+         ;[:div (-> card :fields ((field :id)))]
+         ]
+      )
+      ]
+     ;[:div {:dangerouslySetInnerHTML {:__html
+           ;(.render remarkable (-> template (stache/render data)))}}]
+    ]
+    ))

@@ -28,6 +28,9 @@
 ;fs.readFileSync('<directory>')
 ;fs.writeFileSync(file)
 
+;; TODO: Track readiness via state atom.
+(.init js/kuroshiro #js{:dicPath "dict"})
+
 
 ;; -- React DnD  -----------------------------------------------------------
 
@@ -66,8 +69,7 @@
                       :justify-content 'space-between
                       :align-items 'center
                       :padding-left 12
-                      :padding-righ 12}}
-        [ui/button "Edit Template" #(js/console.log "Edit template.")]]
+                      :padding-righ 12}}]
        [render-card3 (@modal :card-id)]]
     )]])
 
