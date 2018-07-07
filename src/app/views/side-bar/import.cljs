@@ -11,6 +11,12 @@
 (def user-data (-> electron .-remote .-app (.getPath "userData")))
 (def user-data-media (.join path user-data "media"))
 
+(defn randomize-keys [the-keys]
+  (zipmap the-keys (repeatedly #(keyword (str (random-uuid))))))
+
+(defn transform-file-path [save-path file]
+  (js/encodeURI (.join path save-path file)))
+
 ;; TODO: Run this through the spec
 (defn import-deck []
   [:input {:name "import"
@@ -22,47 +28,45 @@
                             (.readFileSync fs)
                             (.toString)
                             (edn/read-string))
-                   user-field-keys (keys (:fields edn))
-                   uuid-keys (map #(keyword (str (random-uuid))) user-field-keys)
-                   new-field-keys (zipmap user-field-keys uuid-keys)
+                   new-field-keys (randomize-keys (keys (:fields edn)))
 
+                   ;; TODO: Dispatch?
                    new-deck (db/add-record! :decks
                               {:name   "Imported Deck"
                                :template ""})
 
                    save-path (.join path user-data-media (name new-deck))
 
+                   ;; Find these dynamically based on field type.
                    media-keys [:audio :screenshot]
 
-                   new-edn (update-in edn [:fields] (fn [fields]
-                     (as-> fields f
-                       (rename-keys f new-field-keys)
+                   transform-card (fn [card]
+                          (-> card
+                            (update-in [:fields] rename-keys new-field-keys)
 
-                       (map (fn [[id field]]
-    (swap! db/state assoc-in [:db :fields id] (assoc field :id id :deck-id new-deck))
-                       ) f)
-                     )
-                   ))
-                   newer-edn (update-in new-edn [:cards] (fn [cards]
-                      (map
-                        (fn [card]
-                          (as-> card c
-                            (update-in c [:fields] rename-keys new-field-keys)
-
-                            (update-in c [:fields (new-field-keys :audio)] 
+                            (update-in [:fields (new-field-keys :audio)] 
                                        #(js/encodeURI (.join path save-path %)))
-                            (update-in c [:fields (new-field-keys :screenshot)] 
+                            (update-in [:fields (new-field-keys :screenshot)] 
                                        #(js/encodeURI (.join path save-path %)))
-                            (assoc c :deck-id new-deck
-                                     :learning? true
-                                     :reviews [])
-                            (db/add-record! :cards c)
+                            (assoc :deck-id new-deck
+                                   :learning? true
+                                   :reviews [])
+                            
                           )
-                        )
-                      cards)) )
+                                    )
 
+                   new-edn (update-in edn [:fields] rename-keys new-field-keys)
                    ]
+               (doall (map (fn [[id field]]
+                (swap! db/state assoc-in [:db :fields id] (assoc field :id id :deck-id new-deck))
+                       ) (new-edn :fields))
+                 )
+               ;; TODO: Sanitize: remove \N
+               ;; remove any backslashes?
+                   (doall (map #(->> % (transform-card) (db/add-record! :cards))
+                               (new-edn :cards)))
 
-             ))}
+             )
+             )}
   ]
 )
