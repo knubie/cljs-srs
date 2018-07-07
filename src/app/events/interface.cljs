@@ -17,6 +17,4 @@
 ;; This is a multi-spec designed to validate the `action` param sent to `handle`
 
 (defmulti event-spec first)
-(defmethod event-spec :ui/select-deck [_]
-  (s/cat :action-name keyword? :deck-id :app.db/deck-id))
 (s/def :app.events/action (s/multi-spec event-spec first))
