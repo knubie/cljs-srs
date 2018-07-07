@@ -43,21 +43,20 @@
                                  :icon icons/doc-text
                                  :on-click #(dispatch [:ui/select-note (note :id)])}])
        [side-bar-section-item {:name "Add Note"
-                               :key :new-note
+                               :key "new-note"
                                :icon icons/plus
                                :on-click #(dispatch [:db/new-note])}]]
 
-      [section {:title "Decks"
-                         :icon icons/book}
+      [section {:title "Decks"}
        (for [[id deck] top-level-decks] ^{:key (deck :id)}
          [deck-item {:deck-id (:id deck)
                      :depth 1
                      :on-click #(dispatch [:ui/select-deck (deck :id)])}])
 
        [side-bar-section-item {:name "Add Deck"
-                               :key :new-deck
+                               :key "new-deck"
                                :icon icons/plus
                                :depth 1
                                :on-click #(dispatch [:db/new-deck])}]
-       [import-deck]
+       [import-deck {:key "import-deck"}]
        ]]]))
