@@ -2,6 +2,7 @@
   (:require [reagent.core    :as r]
             [app.dnd         :as dnd]
             [app.db          :as db]
+            [app.styles      :as styles]
             [app.events      :refer [dispatch]]
             [app.views.icons :as icons]))
 
@@ -44,13 +45,10 @@
 (defn unwrapped-deck-item [props]
   (r/with-let [background (r/atom "")]
 
-    ;(let [deck-id     (keyword (:deckId props))
-          ;deck        (deck-id @db/all-decks)
-          ;child-decks (r/track child-decks-for-deck deck-id)
-          ;depth       (:depth props)
-          ;on-click    (:onClick props)
     (let [deck-id     (keyword (:deckId props))
           deck        (deck-id @db/all-decks)
+          cards       (r/track db/cards-for-deck deck-id)
+          due-cards   (r/track db/to-review @cards)
           child-decks (r/track db/child-decks-for-deck deck-id)
           depth       (:depth props)
           on-click    (:onClick props)
@@ -79,7 +77,11 @@
                    [:div {:style {:white-space 'nowrap
                                   :overflow 'hidden 
                                   :text-overflow 'ellipsis}}
-                    (:name deck)]]
+                    [:span (:name deck)]
+                    (if (pos? (count @due-cards))
+                      [:span {:style styles/side-bar-count}
+                       (count @due-cards)])
+                   ]]
         (for [child-deck @child-decks] ^{:key (child-deck :id)}
          [deck-item {:deck-id (:id child-deck)
                      :depth (+ depth 1)
