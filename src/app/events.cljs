@@ -31,11 +31,14 @@
         (str "spec check failed: "
              (s/explain-str :app.events/action action)) {}))))
 
+(defn ui-event? [action] (-> action first namespace (= "ui")))
+
 ;; TODO: Create UI actions and DB actions.
 ;; DB Actions persist to local storage, whereas UI actions do not.
 (defn dispatch [action]
   (validate-action action)
   (handle action)
   (validate-state)
-  (swap! state update-in [:actions] conj action)
-  (save-state))
+  (when-not (ui-event? action)
+    (swap! state update-in [:actions] conj action)
+    (save-state)))
