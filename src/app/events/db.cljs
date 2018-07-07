@@ -149,7 +149,8 @@
 
 
 (defmethod event-spec :db/add-field [_]
-  (s/cat :action-name keyword? :field :app.db/field))
+  (s/cat :action-name keyword?
+         :field (s/keys :req-un [:app.db/deck-id :app.db/name :app.db/type])))
 (defmethod handle :db/add-field
   [[_ field]]
 
