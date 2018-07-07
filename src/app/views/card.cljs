@@ -36,7 +36,7 @@
 
     [:<>
      [:div
-      (for [field @deck-fields]
+      (for [field @deck-fields] ^{:key (field :id)}
         [:div {:style {:display "flex"}}
          [:div {:style {:width 160}} (field :name)]
          [table/table-cell field card 300]
