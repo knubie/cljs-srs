@@ -28,7 +28,8 @@
         next-interval (* last-interval default-ease)
         next-due      (t/plus last-due (t/days (Math/round next-interval)))]
 
-    (if (= (t/today) (:date last-review))
+    (if (and (= (t/today) (:date last-review))
+             (not (:learning? card))) ;;TODO: Test the not learning thing
       card
 
       (if (and (not (nil? last-review))
