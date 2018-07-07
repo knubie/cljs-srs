@@ -184,7 +184,7 @@
                     (cljs-time/equal?  (% :due) (cljs-time/today))))))
 
 (defn to-learn [cards]
-  (->> cards (filter :learning?)))
+  (->> cards (filter :learning?) (sort-by :sort)))
 
 
 (defn child-decks-for-deck [deck-id]
@@ -209,7 +209,7 @@
                      (-> % :reviews last :date (= (cljs-time/today)))))))
 
 (defn unlearned-cards [cards]
-  (->> cards (filter #(-> % :reviews count (= 0)))))
+  (->> cards (filter #(-> % :reviews count (= 0))) (sort-by :sort)))
 
 ;; -- Persistence ----------------------------------------------------------
 ;;

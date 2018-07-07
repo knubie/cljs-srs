@@ -127,23 +127,29 @@
   :width 32})
 
 (def pop-out-button {
-    :position 'absolute
-    :top 4 :right 6
+  :position 'absolute
+  :top 4 :right 6
 
-    :align-items     'center
-    :user-select     'none
-    :display         'flex
-    :justify-content 'center
-    :height          24
-    :padding         "2px 6px"
-    :background      'white
-    :border          'none
-    :flex-shrink     0
-    :border-radius   3
-    :color "rgb(165, 165, 165)"
-    :box-shadow "rgba(0, 0, 0, 0.08) 0px 0px 1px, rgba(84, 70, 35, 0.14) 0px 1px 3px, rgba(84, 70, 35, 0.2) 0px 1px 8px"
-    :font-size 12
-    :text-transform 'uppercase})
+  :align-items     'center
+  :user-select     'none
+  :display         'flex
+  :justify-content 'center
+  :height          24
+  :padding         "2px 6px"
+  :background      'white
+  :border          'none
+  :flex-shrink     0
+  :border-radius   3
+  :color "rgb(165, 165, 165)"
+  :box-shadow "rgba(0, 0, 0, 0.08) 0px 0px 1px, rgba(84, 70, 35, 0.14) 0px 1px 3px, rgba(84, 70, 35, 0.2) 0px 1px 8px"
+  :font-size 12
+  :text-transform 'uppercase
+})
+
+(def content-editable {
+  :outline 0
+  :-webkit-user-modify "read-write-plaintext-only"
+})
 
 ;; -- Typography -----------------------------------------------------------
 
