@@ -41,8 +41,8 @@
    ;; Add Field
 
    [:div {:on-click #(dispatch [:db/add-field {:deck-id deck-id
-                                               :name "New Image Field"
-                                               :type "image"}])
+                                               :name "Untitled"
+                                               :type "text"}])
           :style {:display 'flex
                   :align-items 'center
                   :justify-content 'center
