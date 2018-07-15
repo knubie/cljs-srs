@@ -94,12 +94,15 @@
          :fields         (s/coll-of :app.db/field)))
 (defmethod handle :db/add-empty-card
   [[_ deck-id fields]]
+  (let [deck-cards (db/cards-for-deck deck-id)
+        next-sort (->> deck-cards (sort-by :sort) last :sort ((fnil inc 0)))]
 
-  (db/add-record! :cards {:deck-id deck-id
-                       :reviews []
-                       :learning? true
-                       ;; TODO: Derive fields
-                       :fields (into {} (for [field fields] [(field :id) ""]))}))
+    (db/add-record! :cards {:deck-id deck-id
+                         :sort next-sort
+                         :reviews []
+                         :learning? true
+                         ;; TODO: Derive fields
+                         :fields (into {} (for [field fields] [(field :id) ""]))})))
 
 ;; TODO: Consolidate these two ----------------------
 
