@@ -3,7 +3,7 @@
             [reagent.core   :as r]
             [app.db         :refer [state]]
             [app.events     :refer [dispatch]]
-            [app.styles           :as styles]))
+            [app.styles     :as styles]))
 
 
 (defn edit-template [deck-id]

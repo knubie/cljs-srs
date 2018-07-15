@@ -6,6 +6,7 @@
             [app.views.workspaces.deck  :refer [deck-workspace]]
             [app.views.topbar           :as topbar]
             [app.styles                 :as styles]
+            [app.events                 :refer [dispatch]]
             [app.db                     :as db]))
 
 
@@ -14,8 +15,15 @@
 ;; -- DB Cursors -----------------------------------------------------------
 
 (defn note-workspace [note-id]
-  (let [note (@db/all-notes note-id)]
+  (let [note    (@db/all-notes note-id)
+        on-blur #(dispatch [:db/edit-note-name
+                            {:note-id note-id :name %}])]
+
     [:div {:style styles/workspace-content}
+     [:div {:content-editable true
+            :on-blur #(-> % .-target .-textContent on-blur)
+            :style (conj styles/h1 styles/content-editable)}
+       (note :name)]
       [:div {:dangerouslySetInnerHTML {:__html
         (-> note :content js/marked)}}]]))
 

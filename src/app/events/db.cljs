@@ -124,6 +124,15 @@
   (swap! db/state assoc-in [:db :decks deck-id :template] template))
 
 
+(defmethod event-spec :db/edit-note-name [_]
+  (s/cat :action-name keyword?
+         :params (s/keys :req-un [:app.db/note-id :app.db/name])))
+(defmethod handle :db/edit-note-name
+  [[_ {:keys [note-id name]}]]
+
+  (swap! db/state assoc-in [:db :notes note-id :name] name))
+
+
 (defmethod event-spec :db/edit-note [_]
   (s/cat :action-name keyword?
          :params (s/keys :req-un [::note-id :app.db/content])))
