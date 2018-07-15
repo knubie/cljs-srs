@@ -33,8 +33,8 @@
                 name]]))
 
 (defn side-bar []
-  (let [top-level-decks (->> @db/all-decks (db/where :deck-id nil)
-                                           (db/where :trashed? nil))]
+  (let [decks (->> @db/all-decks (db/where :deck-id nil))]
+
     [:div {:style styles/side-bar}
      [:div
       [section {:title "Notes"}
@@ -48,15 +48,13 @@
                                :on-click #(dispatch [:db/new-note])}]]
 
       [section {:title "Decks"}
-       (for [[id deck] top-level-decks] ^{:key (deck :id)}
+       (for [[id deck] decks] ^{:key (deck :id)}
          [deck-item {:deck-id (:id deck)
-                     :depth 1
-                     :on-click #(dispatch [:ui/select-deck (deck :id)])}])
+                     :depth 1}])
 
        [side-bar-section-item {:name "Add Deck"
                                :key "new-deck"
                                :icon icons/plus
                                :depth 1
                                :on-click #(dispatch [:db/new-deck])}]
-       [import-deck {:key "import-deck"}]
-       ]]]))
+       [import-deck {:key "import-deck"}] ]]]))

@@ -51,7 +51,6 @@
           due-cards   (r/track db/to-review @cards)
           child-decks (r/track db/child-decks-for-deck deck-id)
           depth       (:depth props)
-          on-click    (:onClick props)
 
           connect-drag-source (:connectDragSource props)
           connect-drop-target (:connectDropTarget props)
@@ -59,7 +58,7 @@
 
       (connect-drag-source (connect-drop-target (r/as-element
       [:div {:style {:background (if is-over "rgba(78, 188, 221, 0.3)" nil)}}
-        [:div {:on-click on-click
+        [:div {:on-click #(dispatch [:ui/select-deck deck-id])
                :on-mouse-enter #(reset! background "rgba(58,56,52,0.08)")
                :on-mouse-leave #(reset! background "")
                :style {:display 'flex
@@ -84,8 +83,7 @@
                    ]]
         (for [child-deck @child-decks] ^{:key (child-deck :id)}
          [deck-item {:deck-id (:id child-deck)
-                     :depth (+ depth 1)
-                     :on-click #(dispatch [:ui/select-deck (child-deck :id)])}])]))))))
+                     :depth (+ depth 1)}])]))))))
 
 (def deck-item
   (dnd/as-drag-source-and-drop-target unwrapped-deck-item deck-dnd-opts))

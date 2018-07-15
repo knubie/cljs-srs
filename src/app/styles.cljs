@@ -23,25 +23,52 @@
   :margin-bottom 1
   :color "rgb(197, 196, 195)"})
 
+(def side-bar-count {
+  :margin-left 4
+  :background "rgba(0,0,0,0.1)"
+  :color "white"
+  :border-radius 2
+  :font-size 10
+  :padding "1px 3px 2px 3px"
+  :font-weight 700
+})
+
 (def workspace {
   :background-color "#FFFFFF"
   :color "#222222"
   :flexGrow 1
   :text-align "center"
-  :overflow 'auto
+  :overflow "auto"
+  :position "relative"
+  :display "flex"
+  :flex-direction "column"
 })
 
 (def workspace-content {
   :width "900px"
   :margin "0 auto"
-  :margin-top "5em"
   :text-align "left"
-  :padding "0px 96px 30vh"
+  :padding "5em 96px 30vh"
+  :overflow "auto"
+})
+
+(def study-buttons {
+  :width "100%"
+  :height 90
+  :min-height 90
+  :display "flex"
+  :justify-content "center"
+  :align-items "center"
+  :position "absolute"
+  :bottom 0
+  :left 0
+  :right 0
 })
 
 (def topbar {
   :width "100%"
   :height 45
+  :min-height 45
   :display "flex"
   :justify-content "space-between"
   :align-items "center"
