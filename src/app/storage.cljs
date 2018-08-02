@@ -20,3 +20,8 @@
          (.readFileSync fs)
          (.writeFileSync fs save-file-path))
     save-file-path))
+
+(defn store-text [file-name text]
+  (let [save-file-path (.join path user-data file-name)]
+    (.writeFile fs save-file-path text #(js/console.log "Saved file."))))
+

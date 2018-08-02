@@ -5,6 +5,7 @@
                  [reagent  "0.8.1"]
                  [cljstache "2.0.1"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
+                 [com.cognitect/transit-cljs "0.8.256"]
                  [cljsjs/antd "3.5.0-0"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]

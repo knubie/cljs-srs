@@ -2,10 +2,12 @@
   (:require [cljs.spec.alpha :as s]
             [cljs.reader     :as edn]
             [app.sample-note :as sample-note]
+            [app.storage     :as storage]
             [reagent.core    :as r]
+            [cognitect.transit :as transit]
             [cljs-time.core  :as cljs-time]
             [cljs-time.coerce :refer [to-local-date]]
-            [cljs-time.instant] ;; Required to serialize data objects as EDN.
+            [cljs-time.instant] ;; Required to serialize date objects as EDN.
             [cljs-time.extend]))
 
 ;; -- Spec -----------------------------------------------------------------
@@ -57,6 +59,16 @@
           :decks  {}
           :fields {}
           :cards  {}}}))
+
+(def init-state
+  {:actions []
+   :ui {:workspace [:home]
+        :modal  {:card-id nil
+                 :open? false}}
+   :db {:notes  {} ;; TODO: Write spec
+        :decks  {}
+        :fields {}
+        :cards  {}}})
 
 (defonce ui-workspace (r/cursor state [:ui :workspace]))
 (defonce all-decks    (r/cursor state [:db :decks]))
@@ -217,17 +229,122 @@
 ;; event. In the future we might selectively store only certain parts of the
 ;; state that gets stored. For instance, we may decide to not store the UI state.
 
-(def local-storage-key "cljs-app")
+(def local-storage-key "cljs-app-transit")
+
+;(defn state->local-storage []
+  ;(let [serialized-state (prn-str @state)]
+    ;(storage/store-text "db.txt" serialized-state)
+    ;(.setItem js/localStorage local-storage-key serialized-state)))
+
+;; ========================================
+
+(defn serialize [a]
+  (js/Promise. (fn [resolve reject]
+                 (js/console.log "starting serialization")
+                 (resolve (prn-str a)))))
+
+(defn store-state [str]
+  (js/Promise. (fn [resolve reject]
+                 (js/console.log "starting persistence")
+    (storage/store-text "db.txt" str)
+    (.setItem js/localStorage local-storage-key str)
+    )))
+
+(def write-handlers
+  {goog.date.Date (transit/write-handler
+                    (constantly "t")
+                    #(.getTime %)
+                    #(-> % .getTime str))})
+
+(def read-handlers
+  {"t" (transit/read-handler
+         #(-> % js/goog.date.UtcDateTime.fromTimestamp to-local-date))})
+
+(defn write-transit [data]
+  (js/console.log "start transit")
+  (transit/write (transit/writer :json {:handlers write-handlers}) data)
+  )
 
 (defn state->local-storage []
-  (.setItem js/localStorage local-storage-key (prn-str @state)))
+  (-> (.resolve js/Promise)
+      (.then #(write-transit @state))
+      ;(.then #(serialize @state))
+      (.then store-state)))
 
+;(defonce myWorker (js/Worker. "js/bootstrap_worker.js"))
+
+;(set! (.-onmessage myWorker) (fn [e]
+  ;(js/console.log "Got back from worker, saving...")
+  ;(.setItem js/localStorage local-storage-key (.-data e))))
+
+;(defn state->local-storage []
+  ;(js/console.log "Sending to worker")
+  ;(js/console.log @state)
+  ;(.postMessage myWorker @state))
+
+;let serialize = new Promise((resolve, reject) => {
+  ;(resolve (prn-str @state))
+;})
+
+;serialize.then((string) => {
+  ;new Promise(resolve, reject) => {
+    ;localStorage.setItem(local-storage-key, string);
+  ;}
+;});
+
+;; =============================================
+
+;(-> js/Promise (.resolve (prn-str @state)))
+
+  ;(-> js/Promise .resolve
+      ;(.then #(storage/store-text "db.txt" (prn-str @state)))
+  ;)
+  ;(-> js/Promise .resolve
+    ;(.then #(.setItem js/localStorage local-storage-key (prn-str @state)))
+  ;)
+  ;(as-> @state s
+       ;(js/console.log "start---")
+       ;(js/console.log (.now js/Date))
+       ;(prn-str s)
+       ;(js/console.log "stringified---")
+       ;(js/console.log (.now js/Date))
+       ;(storage/store-text "db.txt" s)
+       ;(js/console.log "saved---")
+       ;(js/console.log (.now js/Date))
+       ;)
+
+;(defn local-storage->state [local-storage-state]
+  ;(reset! state (some->> local-storage-state
+                         ;(edn/read-string {:readers {'inst to-local-date}}))))
 (defn local-storage->state [local-storage-state]
   (reset! state (some->> local-storage-state
-                         (edn/read-string {:readers {'inst to-local-date}}))))
+        (transit/read (transit/reader :json {:handlers read-handlers}))
+                         )))
+
+;(defn migrate-date []
+
+  ;)
+
+;(def migrations
+  ;[:version 0.1
+   ;:fn (fn [state]
+         
+  ;)]
+  ;[:version 0.1
+   ;:fn (fn [state]
+         ;(update-in [:actions] (fn [actions]
+           ;(remove (fn [action]
+                     ;(re-matches #"select-deck|select-note|set-modal|close-modal|reviewkk" (-> action first name))
+
+                     ;)
+            ;)
+         ;))
+     ;)])
 
 (defn initialize-db []
   (let [local-storage-state (.getItem js/localStorage local-storage-key)]
     (if (nil? local-storage-state)
       (seed-data)
-      (local-storage->state local-storage-state))))
+      (local-storage->state local-storage-state))
+    ;(migrate-data)
+    ))
