@@ -1,6 +1,6 @@
 # Technical Debt
-- [] Move colors into file
-- [] Change add-record! signature to make record first arg, update import.cljs
+- [ ] Move colors into file
+- [ ] Change add-record! signature to make record first arg, update import.cljs
 - [ ] Performance monitoring
    - When are components re-rendering
    - When are they querying the database when they don't need to?
@@ -24,7 +24,7 @@
 - [x] Write specs for events
 - [ ] Add docstrings to functions
 - [~] Add note#show page
-   - [ ] Add ability to edit note
+   - [x] Add ability to edit note
    - [ ] Look into draft.js
 - [ ] Generalize styles
    - [ ] Add support for custom colors (night mode)
@@ -34,33 +34,34 @@
 - [ ] Make generic "editable" component
 
 # Bug
-- [] Audio doesn't play from table view
-- [] Pressing space when on the last frame
-- [x] Test no more than one :remembered review per day
-- [x] Test what happens after a remembered -> forgot -> remembered
-   - [x] Remembering in the learning queue should not add another review?
-   - [x] At lease it shouldn't adjust the due date.
+- [ ] Audio doesn't play from table view
+- [ ] R button only plays audio from the first slide?
 - [ ] What's causing the multiple reviews?
-- [ ] Unable to de-focus empty cell
-- [] Need to write some kind of timing function that updates the db so
+- [] Clicking remember on a card will show the same card again
+- [ ] Need to write some kind of timing function that updates the db so
 that queries based on the current day work.
 
 # Misc
-- [] Enter/Esc to finish editing field name
-- [] Difficult to click into cell to edit
-- [] Some button or something to click when done editting template
-- [] Would be nice if template auto-updated when field names chnage
-- [] Breadcrumbs at the top
-- [] Sort reviewed by due date
+- [ ] Enter/Esc to finish editing field name
+- [ ] Difficult to click into audio cell to edit
+- [ ] Some button or something to click when done editting template
+- [ ] Would be nice if template auto-updated when field names chnage
+- [x] Breadcrumbs at the top
+- [x] Sort reviewed by due date
 
 # Dogfood Req
+- [ ] How many forgottens are in the learning queue
+- [ ] Confirmation on delete (or trashcan)
+- [ ] Undo remember / forget
+- [ ] Add missed cards to end of review
 - [~] **Edit from study view**
 - [~] **Furigana**
+  - [ ] Add option to furigana-ize selected text
 - [ ] Figure out undoing
+- [ ] **Suspend cards**
 - [x] **Top Bar with progress**
    - [x] Cards reviewed today, cards learned today
-- [ ] Stop storing UI actions in local storage
-- [x] Delete from card view
+- [x] Stop storing UI actions in local storage
 - [ ] Keyboard controls from card view
    - [x] R to replay
    - [ ] D to delete
@@ -72,25 +73,27 @@ that queries based on the current day work.
    - [ ] Delete media folder
    - [ ] How to handle notes that are linked to cards?
       - Check notion
+        - Reference stays, but clicking on it will go to 404
    - [ ] Trash
       - Migrate
 - [ ] Suspend cards
-- [ ] Delete cards
+- [x] Delete cards
 - [x] Working SRS
-- [ ] Furigana support
+- [~] Furigana support
 - [~] Import
    - [x] EDN
-   - [] JSON
-   - [] CSV
-   - [] Anki
+   - [ ] JSON
+   - [ ] CSV
+   - [ ] Anki
 - [x] Images on cards
 - [x] Audio on cards
 
 # Launch MVP
+- [] Make "All done" screen nicer
 - [ ] Card "Death Point" ie "burned"
   - No longer shows up once it has been "burned"
 - [ ] Link notes to cards
-   - [] Add a "notes" field type
+   - [x] Add a "notes" field type
       - Contains a list of note IDs
    - [] When the card is rendered, it will have links for each linked note
    - [] When clicked, there will be a popup with the note in it.
