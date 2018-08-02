@@ -1,5 +1,18 @@
 (ns app.styles)
 
+(def sidebar-background       "#F9F7F4")
+(def sidebar-foreground       "#787877")
+(def sidebar-header           "rgb(197, 196, 195)")
+(def workspace-background     "#FFFFFF")
+(def workspace-foreground     "#222222")
+(def table-border             "#DEE1E3")
+(def border-strong            "1px solid rgb(221, 225, 227)")
+(def border-weak              "1px solid rgb(243, 243, 243)")
+(def weak-color               "rgb(153, 153, 153)")
+(def popout-button-foreground "rgb(165, 165, 165)")
+(def h1-foreground            "rgb(34, 34, 34)")
+
+
 (def app {
   :display        "flex"
   :flex-direction "row"
@@ -8,8 +21,8 @@
 
 (def side-bar {
   :padding-top      "45px"
-  :background-color "#F9F7F4"
-  :color            "#787877"
+  :background-color sidebar-background
+  :color            sidebar-foreground
   :text-align       "left"
   :width            "240px"
   :flex-direction   'column
@@ -18,66 +31,68 @@
 (def side-bar-header {
   :letter-spacing "0.03em"
   :text-transform 'uppercase
-  :font-size 11.5
-  :line-height 1
-  :margin-bottom 1
-  :color "rgb(197, 196, 195)"})
+  :font-size      11.5
+  :line-height    1
+  :margin-bottom  1
+  :color          sidebar-header
+})
 
 (def side-bar-count {
-  :margin-left 4
-  :background "rgba(0,0,0,0.1)"
-  :color "white"
+  :margin-left   4
+  :background    "rgba(0,0,0,0.1)"
+  :color         "white"
   :border-radius 2
-  :font-size 10
-  :padding "1px 3px 2px 3px"
-  :font-weight 700
+  :font-size     10
+  :padding       "1px 3px 2px 3px"
+  :font-weight   700
 })
 
 (def workspace {
-  :background-color "#FFFFFF"
-  :color "#222222"
-  :flexGrow 1
-  :text-align "center"
-  :overflow "auto"
-  :position "relative"
-  :display "flex"
-  :flex-direction "column"
+  :background-color workspace-background
+  :color            workspace-foreground
+  :flexGrow         1
+  :text-align       "center"
+  :overflow         "auto"
+  :position         "relative"
+  :display          "flex"
+  :flex-direction   "column"
 })
 
 (def workspace-content {
-  :width "900px"
-  :margin "0 auto"
+  :width      "900px"
+  :margin     "0 auto"
   :text-align "left"
-  :padding "5em 96px 30vh"
-  :overflow "auto"
+  :padding    "5em 96px 30vh"
+  :overflow   "auto"
 })
 
 (def study-buttons {
-  :width "100%"
-  :height 90
-  :min-height 90
-  :display "flex"
+  :background      "white"
+  :width           "100%"
+  :height          90
+  :min-height      90
+  :display         "flex"
   :justify-content "center"
-  :align-items "center"
-  :position "absolute"
-  :bottom 0
-  :left 0
-  :right 0
+  :align-items     "center"
+  :position        "absolute"
+  :bottom          0
+  :left            0
+  :right           0
 })
 
 (def topbar {
-  :width "100%"
-  :height 45
-  :min-height 45
-  :display "flex"
+  :width           "100%"
+  :height          45
+  :min-height      45
+  :display         "flex"
   :justify-content "space-between"
-  :align-items "center"
-  :padding "0 12px"
-  :font-size 14
+  :align-items     "center"
+  :padding         "0 12px"
+  :font-size       14
 })
 
 (def table-td {
-  :border "1px solid #DEE1E3"
+  :border (str "1px solid " table-border)
 })
 
 (def text-input {
@@ -85,10 +100,6 @@
   :outline 'none
   :height "21px"
 })
-
-(def border-strong "1px solid rgb(221, 225, 227)")
-(def border-weak "1px solid rgb(243, 243, 243)")
-(def weak-color "rgb(153, 153, 153)")
 
 (def table-columns {
   :display       'flex
@@ -105,17 +116,19 @@
   ;:flex-shrink  0
   :min-height   32
   :border-right border-weak
-  :width        (/ (- 900 32) field-count)})
+  :width        (/ (- 900 32) field-count)
+})
 
 (def table-new-record {
-  :display 'flex
-  :align-items 'center
-  :color weak-color
-  :border-bottom border-weak
-  :height 32
-  :padding-left 8
+  :display        'flex
+  :align-items    'center
+  :color          weak-color
+  :border-bottom  border-weak
+  :height         32
+  :padding-left   8
   :padding-bottom 2
-  :cursor 'pointer})
+  :cursor         'pointer
+})
 
 (def table-cell {
   :position     "relative"
@@ -125,33 +138,35 @@
   :overflow     "hidden"
   :padding      "5px 8px 6px"
   :border-right border-weak
-  :cursor       'pointer})
+  :cursor       'pointer
+})
 
 (defn editing-table-cell [width] {
   :-webkit-user-modify 'read-write-plaintext-only
-  :outline 0
-  :position "absolute"
-  :top 0
-  :left 0
-  :z-index 9
-  :display "felx"
-  :background-color "#FFFFFF"
-  :padding      "5px 8px 6px"
-  :border-right border-weak
-  :border-radius "3px"
-  :width (max 240 width)
-  :white-space "pre-wrap"
-  :word-break "break-word"
-  :-webkit-line-break "after-white-space"
-  :box-shadow "rgba(84, 70, 35, 0.3) 0px 6px 20px,
-               rgba(84, 70, 35, 0.14) 0px 1px 3px,
-               rgba(0, 0, 0, 0.08) 0px 0px 1px"
+  :outline             0
+  :position            "absolute"
+  :top                 0
+  :left                0
+  :z-index             9
+  :display             "felx"
+  :background-color    workspace-background
+  :padding             "5px 8px 6px"
+  :border-right        border-weak
+  :border-radius       "3px"
+  :width               (max 240 width)
+  :white-space         "pre-wrap"
+  :word-break          "break-word"
+  :-webkit-line-break  "after-white-space"
+  :box-shadow          "rgba(84, 70, 35, 0.3) 0px 6px 20px,
+                       rgba(84, 70, 35, 0.14) 0px 1px 3px,
+                       rgba(0, 0, 0, 0.08) 0px 0px 1px"
 })
 
 (def add-field {
-  :display 'flex
+  :display   'flex
   :flex-grow 1
-  :width 32})
+  :width     32
+})
 
 (def pop-out-button {
   :position 'absolute
@@ -167,8 +182,10 @@
   :border          'none
   :flex-shrink     0
   :border-radius   3
-  :color "rgb(165, 165, 165)"
-  :box-shadow "rgba(0, 0, 0, 0.08) 0px 0px 1px, rgba(84, 70, 35, 0.14) 0px 1px 3px, rgba(84, 70, 35, 0.2) 0px 1px 8px"
+  :color           popout-button-foreground
+  :box-shadow      "rgba(0, 0, 0, 0.08) 0px 0px 1px,
+                    rgba(84, 70, 35, 0.14) 0px 1px 3px,
+                    rgba(84, 70, 35, 0.2) 0px 1px 8px"
   :font-size 12
   :text-transform 'uppercase
 })
@@ -181,11 +198,12 @@
 ;; -- Typography -----------------------------------------------------------
 
 (def h1 {
-  :color "rgb(34, 34, 34)"
-  :font-weight 700
+  :color          "rgb(34, 34, 34)"
+  :font-weight    700
   :letter-spacing "-0.003em"
-  :line-height "1.1"
-  :width "100%"
-  :margin-bottom "0.25em"
-  :font-size "2.375em"
-  :font-family "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Helvetica, \"Apple Color Emoji\", Arial, sans-serif, \"Segoe UI Emoji\", \"Segoe UI Symbol\""})
+  :line-height    "1.1"
+  :width          "100%"
+  :margin-bottom  "0.25em"
+  :font-size      "2.375em"
+  :font-family    "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Helvetica, \"Apple Color Emoji\", Arial, sans-serif, \"Segoe UI Emoji\", \"Segoe UI Symbol\""
+})
