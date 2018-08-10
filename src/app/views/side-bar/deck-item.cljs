@@ -45,12 +45,14 @@
 (defn unwrapped-deck-item [props]
   (r/with-let [background (r/atom "")]
 
-    (let [deck-id     (keyword (:deckId props))
-          deck        (deck-id @db/all-decks)
-          cards       (r/track db/cards-for-deck deck-id)
-          due-cards   (r/track db/to-review @cards)
-          child-decks (r/track db/child-decks-for-deck deck-id)
-          depth       (:depth props)
+    (let [deck-id      (keyword (:deckId props))
+          deck         (deck-id @db/all-decks)
+          cards        (r/track db/cards-for-deck deck-id)
+          due-cards    (r/track db/to-review @cards)
+          lapsed-cards (r/track db/lapsed @cards)
+          child-decks  (r/track db/child-decks-for-deck deck-id)
+          all-cards    (concat @due-cards @lapsed-cards)
+          depth        (:depth props)
 
           connect-drag-source (:connectDragSource props)
           connect-drop-target (:connectDropTarget props)
@@ -77,9 +79,9 @@
                                   :overflow 'hidden 
                                   :text-overflow 'ellipsis}}
                     [:span (:name deck)]
-                    (if (pos? (count @due-cards))
+                    (if (pos? (count all-cards))
                       [:span {:style styles/side-bar-count}
-                       (count @due-cards)])
+                       (count all-cards)])
                    ]]
         (for [child-deck @child-decks] ^{:key (child-deck :id)}
          [deck-item {:deck-id (:id child-deck)

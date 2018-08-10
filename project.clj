@@ -6,7 +6,9 @@
                  [cljstache "2.0.1"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
                  [com.cognitect/transit-cljs "0.8.256"]
-                 [cljsjs/antd "3.5.0-0"]]
+                 [cljsjs/antd "3.5.0-0"]
+                 [cljsjs/react-virtualized "9.18.5-1"]
+                 [cljsjs/draft-js "0.10.5-0"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
             [lein-figwheel  "0.5.16-SNAPSHOT"]]
@@ -15,12 +17,16 @@
 
   :profiles {:dev {:cljsbuild
                     {:builds
-                      {:client {:source-paths ["test"]
+                      {:client {:source-paths ["src"]
                                 :figwheel {:on-jsload "app.core/run"}
                                 :compiler {:main "app.core"
                                            :asset-path "js"
                                            :optimizations :none
                                            :source-map true
+                                           :source-map-timestamp true}}
+                       :worker {:source-paths ["src_worker"]
+                                :figwheel true
+                                :compiler {:optimizations :none
                                            :source-map-timestamp true}}}}}
              :prod {:cljsbuild
                     {:builds
@@ -35,4 +41,8 @@
                {:client
                  {:source-paths ["src"]
                   :compiler     {:output-dir "resources/public/js"
-                                 :output-to  "resources/public/js/main.js"}}}})
+                                 :output-to  "resources/public/js/main.js"}}
+                :worker
+                 {:source-paths ["src_worker"]
+                  :compiler     {:output-dir "resources/public/js/worker_out"
+                                 :output-to  "resources/public/js/worker.js"}}}})

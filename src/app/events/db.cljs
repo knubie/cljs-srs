@@ -95,7 +95,7 @@
 (defmethod handle :db/add-empty-card
   [[_ deck-id fields]]
   (let [deck-cards (db/cards-for-deck deck-id)
-        next-sort (->> deck-cards (sort-by :sort) last :sort ((fnil inc 0)))]
+        next-sort (->> deck-cards (sort-by :sort) last :sort ((fnil inc 1)))]
 
     (db/add-record! :cards {:deck-id deck-id
                          :sort next-sort

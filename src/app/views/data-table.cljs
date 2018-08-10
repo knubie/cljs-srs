@@ -1,6 +1,8 @@
 (ns app.views.data-table
   (:require [reagent.core   :as r]
+            [app.db         :as db]
             [cljsjs.antd]
+            [cljsjs.react-virtualized]
             [app.events     :refer [dispatch]]
             [app.models.card :as c]
             [app.views.util.image-upload :refer [image-upload]]
@@ -11,7 +13,8 @@
 (def border-strong "1px solid rgb(221, 225, 227)")
 (def border-weak "1px solid rgb(243, 243, 243)")
 (def weak-color "rgb(153, 153, 153)")
-(def meta-data-count 2)
+(def meta-data-count 3)
+(def content-width 900)
 
 (defn table-columns [fields meta-data deck-id]
   [:div {:style styles/table-columns}
@@ -28,6 +31,10 @@
              :style (styles/table-field-column (+ meta-data-count (count fields)))}
 
        (field :name)])
+
+    [:div {:key "notes"
+           :style (styles/table-field-column (+ meta-data-count (count fields)))}
+      "Notes"]
 
    ;; Meta Data
 
@@ -143,46 +150,87 @@
                 :controls true}]]])
 
 
+(defmethod table-cell "notes" [field record width]
+  [:div {:key (field :id)
+         :style (merge styles/table-cell {:width width})}
+
+   [:> js/antd.Select {:mode "multiple"
+                       :style {:width "100%"}
+                       :placeholder "Add some notes"
+                       :onChange #(js/console.log %)}
+
+    (for [[id note] @db/all-notes] ^{:key (note :id)}
+      [:> js/antd.Select.Option (note :name)])]])
+
+
 (defn table-row [meta-data fields record]
-  (r/with-let [hover? (r/atom false)]
+  (r/with-let [hover? (r/atom false)
+               ]
 
-    [:div {:key (record :id)
-           :on-mouse-enter #(reset! hover? true)
-           :on-mouse-leave #(reset! hover? false)
-           :style {:display       'flex
-                   :position      'relative
-                   :border-bottom border-strong}}
+    (let [column-width (/ (- content-width 32) (+ meta-data-count (count fields)))
+          ]
 
-     (if @hover?
-       [:div {:style styles/pop-out-button
-              :on-click #(dispatch [:ui/set-modal (record :id)])}
-        [icons/popup 10 10] "Preview"])
+      [:div {
+             :on-mouse-enter #(reset! hover? true)
+             :on-mouse-leave #(reset! hover? false)
+             :style 
+                      {:display       'flex
+                       :position      'relative
+                       :border-bottom border-strong}
+                      
+             }
 
-     (for [field fields] ^{:key (:id field)}
-       [table-cell field record (/ (- 900 32) (+ meta-data-count (count fields)))])
+       (if @hover?
+         [:div {:style styles/pop-out-button
+                :on-click #(dispatch [:ui/set-modal (record :id)])}
+          [icons/popup 10 10] "Preview"])
+
+       (for [field fields] ^{:key (:id field)}
+         [table-cell field record column-width])
+
+      [table-cell {:type "notes"} nil column-width]
+
+      (for [datum meta-data]
+        [:div {:key (datum :name)
+               :style {:display      'flex
+                       :align-items  'center
+                       :cursor       'default
+                       :padding      "0 8px"
+                       :min-height   32
+                       :width        column-width
+                       :border-right border-weak}}
+         (-> record ((datum :fn)))])
 
 
-    (for [datum meta-data]
-      [:div {:key (datum :name)
-             :style {:display      'flex
-                     :align-items  'center
-                     :cursor       'default
-                     :padding      "0 8px"
-                     :min-height   32
-                     :width        (/ (- 900 32) (+ meta-data-count (count fields)))
-                     :border-right border-weak}}
-       (-> record ((datum :fn)))])
+       ;; Add-Field Column
+       [:div {:style {:width 32 :flex-grow 1}}]])))
 
 
-     ;; Add-Field Column
-     [:div {:style {:width 32 :flex-grow 1}}]]))
+;(defn table-rows [fields meta-data records]
+  ;[:div
+   ;(for [record records]
+     ;^{:key (record :id)} [table-row meta-data fields record])])
 
 
+; 49 -real
+; 58 - expanded
 (defn table-rows [fields meta-data records]
-  [:div
-   (for [record records]
-     ^{:key (record :id)} [table-row meta-data fields record])])
+  (let [foobar (fn [opts]
 
+                    (r/as-element 
+                      [:div {:key (.-key opts) :style (.-style opts)}
+                      [table-row meta-data fields
+                                   (nth records (.-index opts))
+                                   
+                                   ]
+                       ]
+                      )
+                 )]
+    [:> js/ReactVirtualized.List {:width       710
+                                  :height      700
+                                  :rowHeight   58
+                                  :rowCount    (count records)
+                                  :rowRenderer foobar}]))
 
 (defn table-new-record [deck-id fields]
   [:div {:on-click #(dispatch [:db/add-empty-card deck-id fields])
@@ -192,7 +240,7 @@
 
 (defn data-table [fields records deck-id]
   (let [meta-data [{:name "Due"      :fn c/formatted-due}
-                   {:name "Progress" :fn c/progress}]]
+                   {:name "Progress" :fn :sort}]]
     [:div
      [table-columns fields meta-data deck-id]
      [table-rows    fields meta-data records]

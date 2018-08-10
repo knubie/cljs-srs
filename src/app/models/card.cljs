@@ -26,27 +26,33 @@
         last-due      (or (:due last-review) (t/today))
         last-interval (or (:interval last-review) 0.5)
         next-interval (* last-interval default-ease)
-        next-due      (t/plus last-due (t/days (Math/round next-interval)))]
+        next-due      (t/plus (t/today) (t/days (Math/round next-interval)))
+        _ (js/console.log (str  "remember card " (name (:id card))))]
 
     (if (and (= (t/today) (:date last-review))
              (not (:learning? card))) ;;TODO: Test the not learning thing
-      card
+      (do (js/console.log "already reviewed, not learning")
+          card)
 
       (if (and (not (nil? last-review))
                (not (:remembered? last-review))
                (:learning? card))
 
-        (-> card
-          (assoc :learning? false))
+        (do (js/console.log "is learning")
+          (-> card
+            (assoc :learning? false)))
 
-        (-> card
-         (assoc :due next-due)
-         (assoc :learning? false)
-         (update-in [:reviews]
-           conj {:date (t/today)
-                 :due next-due
-                 :interval next-interval
-                 :remembered? true})))
+        (do (js/console.log "is not learning (actual remember)")
+         (-> card
+             (assoc :due next-due)
+             (assoc :learning? false)
+             (update-in [:reviews]
+               conj {:date (t/today)
+                     :due next-due
+                     :interval next-interval
+                     :remembered? true}))
+            )
+        )
       )
 
 

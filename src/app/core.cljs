@@ -2,7 +2,7 @@
   (:require [reagent.core        :as r]
             [cljsjs.antd]
             [app.dnd             :as dnd]
-            [app.db              :refer [modal initialize-db]]
+            [app.db              :refer [state modal initialize-db]]
             [app.events          :refer [dispatch]]
             [app.views.card      :refer [render-card3]]
             [app.views.side-bar  :refer [side-bar]]
@@ -45,6 +45,18 @@
 ;; See app.db/initialize-db for more info.
 
 (initialize-db)
+
+;; -- Worker shit ----------------------------------------------------------
+;var myWorker = new Worker('worker.js');
+;(def myWorker (js/Worker. "js/worker.js"))
+;myWorker.postMessage([first.value,second.value]);
+;(js/console.log "start message")
+;(.postMessage myWorker (clj->js @state))
+;(js/console.log "end message")
+;myWorker.onmessage = function(e) {
+  ;console.log('Message received from worker');
+;}
+
 
 ;; -- View Components ------------------------------------------------------
 ;;

@@ -195,6 +195,12 @@
        (filter #(or (cljs-time/before? (% :due) (cljs-time/today))
                     (cljs-time/equal?  (% :due) (cljs-time/today))))))
 
+(defn lapsed [collection]
+  (->> collection
+       (#(if (map? %) (vals %) %))
+       (filter #(and (-> % :reviews not-empty)
+                     (-> % :learning?)))))
+
 (defn to-learn [cards]
   (->> cards (filter :learning?) (sort-by :sort)))
 
@@ -231,17 +237,10 @@
 
 (def local-storage-key "cljs-app-transit")
 
-;(defn state->local-storage []
-  ;(let [serialized-state (prn-str @state)]
-    ;(storage/store-text "db.txt" serialized-state)
-    ;(.setItem js/localStorage local-storage-key serialized-state)))
-
-;; ========================================
-
-(defn serialize [a]
-  (js/Promise. (fn [resolve reject]
-                 (js/console.log "starting serialization")
-                 (resolve (prn-str a)))))
+;(defn serialize [a]
+  ;(js/Promise. (fn [resolve reject]
+                 ;(js/console.log "starting serialization")
+                 ;(resolve (prn-str a)))))
 
 (defn store-state [str]
   (js/Promise. (fn [resolve reject]
@@ -260,10 +259,11 @@
   {"t" (transit/read-handler
          #(-> % js/goog.date.UtcDateTime.fromTimestamp to-local-date))})
 
+(def writer (transit/writer :json {:handlers write-handlers}))
+(def reader (transit/reader :json {:handlers read-handlers}))
+
 (defn write-transit [data]
-  (js/console.log "start transit")
-  (transit/write (transit/writer :json {:handlers write-handlers}) data)
-  )
+  (transit/write writer data))
 
 (defn state->local-storage []
   (-> (.resolve js/Promise)
@@ -286,65 +286,15 @@
   ;(resolve (prn-str @state))
 ;})
 
-;serialize.then((string) => {
-  ;new Promise(resolve, reject) => {
-    ;localStorage.setItem(local-storage-key, string);
-  ;}
-;});
-
-;; =============================================
-
-;(-> js/Promise (.resolve (prn-str @state)))
-
-  ;(-> js/Promise .resolve
-      ;(.then #(storage/store-text "db.txt" (prn-str @state)))
-  ;)
-  ;(-> js/Promise .resolve
-    ;(.then #(.setItem js/localStorage local-storage-key (prn-str @state)))
-  ;)
-  ;(as-> @state s
-       ;(js/console.log "start---")
-       ;(js/console.log (.now js/Date))
-       ;(prn-str s)
-       ;(js/console.log "stringified---")
-       ;(js/console.log (.now js/Date))
-       ;(storage/store-text "db.txt" s)
-       ;(js/console.log "saved---")
-       ;(js/console.log (.now js/Date))
-       ;)
-
 ;(defn local-storage->state [local-storage-state]
   ;(reset! state (some->> local-storage-state
                          ;(edn/read-string {:readers {'inst to-local-date}}))))
 (defn local-storage->state [local-storage-state]
   (reset! state (some->> local-storage-state
-        (transit/read (transit/reader :json {:handlers read-handlers}))
-                         )))
-
-;(defn migrate-date []
-
-  ;)
-
-;(def migrations
-  ;[:version 0.1
-   ;:fn (fn [state]
-         
-  ;)]
-  ;[:version 0.1
-   ;:fn (fn [state]
-         ;(update-in [:actions] (fn [actions]
-           ;(remove (fn [action]
-                     ;(re-matches #"select-deck|select-note|set-modal|close-modal|reviewkk" (-> action first name))
-
-                     ;)
-            ;)
-         ;))
-     ;)])
+                         (transit/read reader))))
 
 (defn initialize-db []
   (let [local-storage-state (.getItem js/localStorage local-storage-key)]
     (if (nil? local-storage-state)
       (seed-data)
-      (local-storage->state local-storage-state))
-    ;(migrate-data)
-    ))
+      (local-storage->state local-storage-state))))

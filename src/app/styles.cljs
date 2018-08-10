@@ -60,6 +60,7 @@
 
 (def workspace-content {
   :width      "900px"
+  :height     "100%"
   :margin     "0 auto"
   :text-align "left"
   :padding    "5em 96px 30vh"

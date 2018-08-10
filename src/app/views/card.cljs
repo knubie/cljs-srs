@@ -1,5 +1,6 @@
 (ns app.views.card
   (:require [reagent.core   :as r]
+            [clojure.string :as str]
             [app.models.card :refer [formatted-due]]
             [app.views.data-table :as table]
             [app.db         :as db]
@@ -13,17 +14,26 @@
               (for [field deck-fields]
                 [(-> field :name keyword)
                  (-> card :fields ((:id field)))]))
-        furigana (fn [s] (.convert js/kuroshiro s #js{:mode "furigana" :to "hiragana"}))]
+        furigana (fn [s] (.convert js/kuroshiro (clj->js s) #js{:mode "furigana" :to "hiragana"}))
+        ;convert-furigana-block  (fn [s] (str/replace s #"ffffurigana\s(.*)\sfff" furigana))
+        convert-furigana-block  (fn [s] (str/replace s #"ffffurigana\s([\s\S]+)\sfff" #(-> % (get 1) furigana)))
+        ;convert-furigana-block  (fn [s] (str/replace s #"ffffurigana" "bitch"))
+        ;convert-furigana-block  (fn [s] (str/replace s #"ffffurigana" "bitch"))
+        ;_ (aset js/window "foo" (-> template (stache/render data)))
+        ;convert-furigana-block (fn [s] s)
+        ]
 
+
+    [:<>
+     [:div (card :id)]
     [:div {:dangerouslySetInnerHTML {:__html
-      (.render remarkable (-> template (stache/render data) 
+      (.render remarkable (-> template (stache/render data) convert-furigana-block
                                      
                                      ;kuroshiro.convert(_, #js{mode: "furigana", to: "hiragana"});
-                                     ))}}]))
+                                     ))}}]]))
 
 ;; TODO: Rename this?
 (defn render-card3 [card-id]
-  ;; TODO: Use r/track here
   (let [card        (@db/all-cards card-id)
         deck-id     (card :deck-id)
         deck        (@db/all-decks deck-id)
@@ -39,12 +49,7 @@
       (for [field @deck-fields] ^{:key (field :id)}
         [:div {:style {:display "flex"}}
          [:div {:style {:width 160}} (field :name)]
-         [table/table-cell field card 300]
-         ;[:div (-> card :fields ((field :id)))]
-         ]
-      )
-      ]
-     ;[:div {:dangerouslySetInnerHTML {:__html
-           ;(.render remarkable (-> template (stache/render data)))}}]
-    ]
-    ))
+         [table/table-cell field card 300]])
+      [:div {:style {:display "flex"}}
+       [:div {:style {:width 160}} "Notes"]
+       [table/table-cell {:type "notes"} card 300]]]]))
