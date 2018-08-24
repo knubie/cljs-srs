@@ -26,8 +26,9 @@
       [:div {:key (field :id)
              :content-editable true
              :suppress-content-editable-warning true
-             :on-blur #(dispatch [:db/edit-field
-               (assoc field :name (-> % .-target .-textContent))])
+             :on-blur #(if-not (= (-> % .-target) (.-activeElement js/document))
+                         (dispatch [:db/edit-field
+                           (assoc field :name (-> % .-target .-textContent))]))
              :style (styles/table-field-column (+ meta-data-count (count fields)))}
 
        (field :name)])
@@ -67,7 +68,9 @@
 
     [:div {:content-editable true
            :style (styles/editing-table-cell width)
-           :on-blur #(-> % .-target .-textContent save)
+           :on-blur #(if-not (= (-> % .-target) (.-activeElement js/document))
+                       (-> % .-target .-textContent save))
+           ;:on-blur #(-> % .-target .-textContent save)
            :on-key-down #(case (.-which %)
                            ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
