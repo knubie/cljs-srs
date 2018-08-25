@@ -10,11 +10,51 @@
             [app.views.util.keyboard :as kbd]
             [app.styles     :as styles]))
 
-(def border-strong "1px solid rgb(221, 225, 227)")
-(def border-weak "1px solid rgb(243, 243, 243)")
-(def weak-color "rgb(153, 153, 153)")
-(def meta-data-count 3)
+(def meta-data-count 2)
 (def content-width 900)
+
+(defn on-blur [fn]
+  #(if-not (= (-> % .-target) (.-activeElement js/document))
+     (fn %)))
+
+
+(defn table-field-header [field field-count]
+  [:> js/antd.Popover {:placement "bottom"
+                       :trigger   "click"
+                       :content   (r/as-element
+
+  [:<>
+    [:div {:content-editable true
+           :style {:width 212
+                   :margin-left 14
+                   :margin-right 14}
+           :on-blur (on-blur
+                      #(dispatch [:db/edit-field
+                         (assoc field :name (-> % .-target .-textContent))]))}
+     (field :name)]
+    [:> js/antd.Menu {:mode "vertical"}
+     [:> (-> js/antd .-Menu .-SubMenu) {:title "Property Type"}
+      [:> (-> js/antd .-Menu .-Item)
+       {:on-click #(dispatch [:db/edit-field
+                    (assoc field :type "text")])}
+       "text"]
+      [:> (-> js/antd .-Menu .-Item)
+       {:on-click #(dispatch [:db/edit-field
+                    (assoc field :type "image")])}
+       "image"]
+      [:> (-> js/antd .-Menu .-Item)
+       {:on-click #(dispatch [:db/edit-field
+                    (assoc field :type "audio")])}
+       "audio"]
+      ]]
+  ]
+  )}
+
+  [:div {:style (styles/table-field-column field-count)}
+   (field :name)]
+  ]
+)
+  
 
 (defn table-columns [fields meta-data deck-id]
   [:div {:style styles/table-columns}
@@ -23,19 +63,22 @@
    
     (for [field fields]
       ;;[icons/attach 13 13 4] 
-      [:div {:key (field :id)
-             :content-editable true
-             :suppress-content-editable-warning true
-             :on-blur #(if-not (= (-> % .-target) (.-activeElement js/document))
-                         (dispatch [:db/edit-field
-                           (assoc field :name (-> % .-target .-textContent))]))
-             :style (styles/table-field-column (+ meta-data-count (count fields)))}
+      [table-field-header field (+ meta-data-count (count fields))]
+      )
+      ;[:div {:key (field :id)
+             ;:content-editable true
+             ;:suppress-content-editable-warning true
+             ;:on-blur (on-blur
+                        ;#(dispatch [:db/edit-field
+                           ;(assoc field :name (-> % .-target .-textContent))]))
+             ;:style (styles/table-field-column (+ meta-data-count (count fields)))}
 
-       (field :name)])
+       ;(field :name)])
 
-    [:div {:key "notes"
-           :style (styles/table-field-column (+ meta-data-count (count fields)))}
-      "Notes"]
+    ;[:div {:key "notes"
+           ;:style (styles/table-field-column (+ meta-data-count
+                                                ;(count fields)))}
+      ;"Notes"]
 
    ;; Meta Data
 
@@ -55,7 +98,7 @@
                   :align-items 'center
                   :justify-content 'center
                   :flex-grow 1
-                  :color weak-color
+                  :color styles/weak-color
                   :width 32}}
     [icons/plus 18 18]]])
 
@@ -68,9 +111,7 @@
 
     [:div {:content-editable true
            :style (styles/editing-table-cell width)
-           :on-blur #(if-not (= (-> % .-target) (.-activeElement js/document))
-                       (-> % .-target .-textContent save))
-           ;:on-blur #(-> % .-target .-textContent save)
+           :on-blur (on-blur #(-> % .-target .-textContent save))
            :on-key-down #(case (.-which %)
                            ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
@@ -170,8 +211,8 @@
   (r/with-let [hover? (r/atom false)
                ]
 
-    (let [column-width (/ (- content-width 32) (+ meta-data-count (count fields)))
-          ]
+    (let [column-width (/ (- content-width 32) (+ meta-data-count
+                                                  (count fields)))]
 
       [:div {
              :on-mouse-enter #(reset! hover? true)
@@ -179,7 +220,7 @@
              :style 
                       {:display       'flex
                        :position      'relative
-                       :border-bottom border-strong}
+                       :border-bottom styles/border-strong}
                       
              }
 
@@ -191,7 +232,7 @@
        (for [field fields] ^{:key (:id field)}
          [table-cell field record column-width])
 
-      [table-cell {:type "notes"} nil column-width]
+      ;[table-cell {:type "notes"} nil column-width]
 
       (for [datum meta-data]
         [:div {:key (datum :name)
@@ -201,7 +242,7 @@
                        :padding      "0 8px"
                        :min-height   32
                        :width        column-width
-                       :border-right border-weak}}
+                       :border-right styles/border-weak}}
          (-> record ((datum :fn)))])
 
 
@@ -237,7 +278,7 @@
 
 (defn table-new-record [deck-id fields]
   [:div {:on-click #(dispatch [:db/add-empty-card deck-id fields])
-         :style styles/table-new-record}
+         :style    styles/table-new-record}
    [icons/plus 18 18 4] "Add a Card"])
 
 
@@ -245,6 +286,6 @@
   (let [meta-data [{:name "Due"      :fn c/formatted-due}
                    {:name "Progress" :fn :sort}]]
     [:div
-     [table-columns fields meta-data deck-id]
-     [table-rows    fields meta-data records]
+     [table-columns    fields meta-data deck-id]
+     [table-rows       fields meta-data records]
      [table-new-record deck-id fields]]))

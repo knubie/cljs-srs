@@ -37,7 +37,9 @@
 - [ ] Audio doesn't play from table view
 - [ ] R button only plays audio from the first slide?
 - [ ] What's causing the multiple reviews?
-- [] Clicking remember on a card will show the same card again
+   - [ ] Making a card due on the same day
+   - [ ] Card was in the learning queue
+- [ ] Clicking remember on a card will show the same card again
 - [ ] Need to write some kind of timing function that updates the db so
 that queries based on the current day work.
 - [x] Shouldn't lose focus of input when switching windows.

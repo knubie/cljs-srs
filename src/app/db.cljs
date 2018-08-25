@@ -175,6 +175,13 @@
        (filter #(-> % second key (= matcher))) ;; `second` is used to grab
        (into {})))                             ;; the record. [:id { .. }]
 
+;(defn wherein [key matcher collection]
+  ;(let [matcher->fn #(eval (concat matcher (cons % '())))]
+
+    ;(->> collection
+         ;(filter #(-> % second key matcher->fn)) ;; `second` is used to grab
+         ;(into {}))))                            ;; the record. [:id { .. }]
+
 (defn where-id [keys collection]
   (select-keys collection keys))
 
@@ -214,7 +221,25 @@
 
 
 (defn cards-for-deck [deck-id]
-  (->> @all-cards (where :deck-id deck-id) vals))
+  (let [all-deck-ids
+        (loop [deck-ids [deck-id]
+               find-for [deck-id]]
+          (let [child-deck-ids (->> find-for
+                                    (map child-decks-for-deck)
+                                    flatten
+                                    (keep identity)
+                                    (map :id))]
+            (if (empty? child-deck-ids)
+              deck-ids
+              (recur (concat deck-ids child-deck-ids) ;; new deck-ids
+                     child-deck-ids))))]              ;; new find-for
+
+  (->> all-deck-ids
+       (map #(->> @all-cards (where :deck-id %) vals))
+       (keep identity)
+       flatten
+       )
+  ))
 
 
 (defn learned-cards [cards]
