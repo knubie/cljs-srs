@@ -10,6 +10,10 @@
             [app.views.util.keyboard :as kbd]
             [app.styles     :as styles]))
 
+(def Menu     js/antd.Menu)
+(def SubMenu  js/antd.Menu.SubMenu)
+(def MenuItem js/antd.Menu.Item)
+
 (def meta-data-count 2)
 (def content-width 900)
 
@@ -17,43 +21,39 @@
   #(if-not (= (-> % .-target) (.-activeElement js/document))
      (fn %)))
 
+(defn with-content [fn]
+  #(-> % .-target .-textContent fn))
 
 (defn table-field-header [field field-count]
+  (let [edit-field-name #(dispatch [:db/edit-field (assoc field :name %)])
+        edit-field-type #(dispatch [:db/edit-field (assoc field :type %)])]
+
   [:> js/antd.Popover {:placement "bottom"
                        :trigger   "click"
                        :content   (r/as-element
 
-  [:<>
-    [:div {:content-editable true
-           :style {:width 212
-                   :margin-left 14
-                   :margin-right 14}
-           :on-blur (on-blur
-                      #(dispatch [:db/edit-field
-                         (assoc field :name (-> % .-target .-textContent))]))}
-     (field :name)]
-    [:> js/antd.Menu {:mode "vertical"}
-     [:> (-> js/antd .-Menu .-SubMenu) {:title "Property Type"}
-      [:> (-> js/antd .-Menu .-Item)
-       {:on-click #(dispatch [:db/edit-field
-                    (assoc field :type "text")])}
-       "text"]
-      [:> (-> js/antd .-Menu .-Item)
-       {:on-click #(dispatch [:db/edit-field
-                    (assoc field :type "image")])}
-       "image"]
-      [:> (-> js/antd .-Menu .-Item)
-       {:on-click #(dispatch [:db/edit-field
-                    (assoc field :type "audio")])}
-       "audio"]
-      ]]
-  ]
-  )}
+    ;; Popover Content
+    [:<>
+      ;; Edit Name
+      [:div {:content-editable true
+             :style (merge styles/content-editable
+                           {:width        212
+                            :margin-left  14
+                            :margin-right 14})
+             :on-blur (on-blur (with-content edit-field-name))}
 
-  [:div {:style (styles/table-field-column field-count)}
-   (field :name)]
-  ]
-)
+       (field :name)]
+
+      ;; Edit Type
+      [:> Menu {:mode "vertical"}
+       [:> SubMenu {:title "Property Type"}
+        [:> MenuItem {:on-click #(edit-field-type "text")}  "text"]
+        [:> MenuItem {:on-click #(edit-field-type "image")} "image"]
+        [:> MenuItem {:on-click #(edit-field-type "audio")} "audio"]]]])}
+
+    ;; Popover Trigger Element
+    [:div {:style (styles/table-field-column field-count)}
+     (field :name)]]))
   
 
 (defn table-columns [fields meta-data deck-id]
@@ -110,8 +110,8 @@
   (r/with-let [save #(-> % str clojure.string/trim on-save)]
 
     [:div {:content-editable true
-           :style (styles/editing-table-cell width)
-           :on-blur (on-blur #(-> % .-target .-textContent save))
+           :style       (styles/editing-table-cell width)
+           :on-blur     (on-blur #(-> % .-target .-textContent save))
            :on-key-down #(case (.-which %)
                            ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
@@ -121,7 +121,7 @@
 (def table-cell-text-edit
   (with-meta text-edit
     {:component-did-mount (fn [el]
-      ;; All this bullshit just to get the curdor at the
+      ;; All this bullshit just to get the cursor at the
       ;; end of the text.
       (let [range (js/document.createRange)
             sel (js/window.getSelection)]
@@ -208,21 +208,14 @@
 
 
 (defn table-row [meta-data fields record]
-  (r/with-let [hover? (r/atom false)
-               ]
+  (r/with-let [hover? (r/atom false)]
 
     (let [column-width (/ (- content-width 32) (+ meta-data-count
                                                   (count fields)))]
 
-      [:div {
-             :on-mouse-enter #(reset! hover? true)
-             :on-mouse-leave #(reset! hover? false)
-             :style 
-                      {:display       'flex
-                       :position      'relative
-                       :border-bottom styles/border-strong}
-                      
-             }
+      [:div {:style {:display       'flex
+                     :position      'relative
+                     :border-bottom styles/border-strong}}
 
        (if @hover?
          [:div {:style styles/pop-out-button
@@ -249,15 +242,12 @@
        ;; Add-Field Column
        [:div {:style {:width 32 :flex-grow 1}}]])))
 
-
-;(defn table-rows [fields meta-data records]
-  ;[:div
-   ;(for [record records]
-     ;^{:key (record :id)} [table-row meta-data fields record])])
-
-
 ; 49 -real
 ; 58 - expanded
+(defn row-renderer [opts]
+  (let [key   (.-key opts)
+        style (.-style opts)
+        index (.-index opts)]
 
     (r/as-element
       [:div {:key key :style style}
