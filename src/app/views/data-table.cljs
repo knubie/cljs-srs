@@ -258,23 +258,27 @@
 
 ; 49 -real
 ; 58 - expanded
-(defn table-rows [fields meta-data records]
-  (let [foobar (fn [opts]
 
-                    (r/as-element 
-                      [:div {:key (.-key opts) :style (.-style opts)}
-                      [table-row meta-data fields
-                                   (nth records (.-index opts))
-                                   
-                                   ]
-                       ]
-                      )
-                 )]
-    [:> js/ReactVirtualized.List {:width       710
-                                  :height      700
-                                  :rowHeight   58
-                                  :rowCount    (count records)
-                                  :rowRenderer foobar}]))
+    (r/as-element
+      [:div {:key key :style style}
+       [table-row meta-data fields (nth records index)]])))
+
+(defn table-rows [fields meta-data records]
+  (let [row-renderer #(r/as-element 
+                        [:div {:key (.-key %) :style (.-style %)}
+                         [table-row
+                          meta-data
+                          fields
+                          (nth records (.-index %))]])]
+
+    [:div {:style {:flex "1 1 auto"}}
+     [:> js/ReactVirtualized.AutoSizer {:disableWidth true}
+      #(r/as-element [:> js/ReactVirtualized.List
+                      {:width       710
+                       :height      (.-height %)
+                       :rowHeight   58
+                       :rowCount    (count records)
+                       :rowRenderer row-renderer}])]]))
 
 (defn table-new-record [deck-id fields]
   [:div {:on-click #(dispatch [:db/add-empty-card deck-id fields])
@@ -285,7 +289,9 @@
 (defn data-table [fields records deck-id]
   (let [meta-data [{:name "Due"      :fn c/formatted-due}
                    {:name "Progress" :fn :sort}]]
-    [:div
+    [:div {:style {:display "flex"
+                   :flex-direction "column"
+                   :flex "1 0 auto"}}
      [table-columns    fields meta-data deck-id]
      [table-rows       fields meta-data records]
      [table-new-record deck-id fields]]))

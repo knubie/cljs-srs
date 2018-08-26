@@ -63,8 +63,10 @@
   :height     "100%"
   :margin     "0 auto"
   :text-align "left"
-  :padding    "5em 96px 30vh"
+  :padding    "5em 96px"
   :overflow   "auto"
+  :display    "flex"
+  :flex-direction "column"
 })
 
 (def study-buttons {
@@ -106,7 +108,8 @@
   :display       'flex
   :border-top    border-strong
   :border-bottom border-strong
-  :color         weak-color})
+  :color         weak-color
+  :flex          "0 0 auto"})
 
 (defn table-field-column [field-count] {
   :display      'flex
@@ -121,14 +124,15 @@
 })
 
 (def table-new-record {
-  :display        'flex
-  :align-items    'center
+  :display        "flex"
+  :align-items    "center"
   :color          weak-color
   :border-bottom  border-weak
   :height         32
   :padding-left   8
   :padding-bottom 2
-  :cursor         'pointer
+  :cursor         "pointer"
+  :flex           "0 0 auto"
 })
 
 (def table-cell {

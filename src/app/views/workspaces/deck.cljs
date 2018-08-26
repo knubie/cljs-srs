@@ -18,8 +18,8 @@
                                        {:deck-id deck-id :name %}])]
 
     [:div {:style styles/workspace-content}
-     [:div (deck :id)]
-     [:div {:style {:margin-bottom "0.5em"}}
+     [:div {:style {:flex "0 0 auto"}}(deck :id)]
+     [:div {:style {:flex "0 0 auto" :margin-bottom "0.5em"}}
       [:div {:content-editable true
              :on-blur #(-> % .-target .-textContent update-deck-name)
              :style (conj styles/h1 styles/content-editable)}
@@ -27,8 +27,8 @@
 
      [:div {:content-editable true
             :on-change #(-> % .-target .-textContent update-search-term)
-            :style styles/content-editable}
+            :style (conj styles/content-editable {:flex "0 0 auto"})}
       @search-term]
 
-     [data-table @deck-fields all-cards deck-id @search-term]]))
+     [data-table @deck-fields all-cards deck-id]]))
 
