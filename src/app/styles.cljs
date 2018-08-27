@@ -135,6 +135,15 @@
   :flex           "0 0 auto"
 })
 
+(def table-add-field {
+  :display         "flex"
+  :align-items     "center"
+  :justify-content "center"
+  :flex-grow       1
+  :color           weak-color
+  :width           32
+})
+
 (def table-cell {
   :position     "relative"
   :display      "flex"

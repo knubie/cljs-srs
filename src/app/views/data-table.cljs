@@ -1,14 +1,16 @@
 (ns app.views.data-table
-  (:require [reagent.core   :as r]
-            [app.db         :as db]
+  (:require [reagent.core                :as r]
+            [app.db                      :as db]
+            [app.events                  :refer [dispatch]]
+            [app.styles                  :as styles]
+            [app.models.card             :as c]
+            [app.views.icons             :as icons]
+            [app.views.util.image-upload :refer [image-upload]]
+            [app.views.util.keyboard     :as kbd]
+            [app.views.util.helpers      :refer [on-blur with-content]]
             [cljsjs.antd]
             [cljsjs.react-virtualized]
-            [app.events     :refer [dispatch]]
-            [app.models.card :as c]
-            [app.views.util.image-upload :refer [image-upload]]
-            [app.views.icons :as icons]
-            [app.views.util.keyboard :as kbd]
-            [app.styles     :as styles]))
+            ))
 
 (def Menu     js/antd.Menu)
 (def SubMenu  js/antd.Menu.SubMenu)
@@ -17,22 +19,9 @@
 (def meta-data-count 2)
 (def content-width 900)
 
-(defn on-blur [fn]
-  #(if-not (= (-> % .-target) (.-activeElement js/document))
-     (fn %)))
-
-(defn with-content [fn]
-  #(-> % .-target .-textContent fn))
-
-(defn table-field-header [field field-count]
+(defn field-header-popover [field]
   (let [edit-field-name #(dispatch [:db/edit-field (assoc field :name %)])
         edit-field-type #(dispatch [:db/edit-field (assoc field :type %)])]
-
-  [:> js/antd.Popover {:placement "bottom"
-                       :trigger   "click"
-                       :content   (r/as-element
-
-    ;; Popover Content
     [:<>
       ;; Edit Name
       [:div {:content-editable true
@@ -49,7 +38,15 @@
        [:> SubMenu {:title "Property Type"}
         [:> MenuItem {:on-click #(edit-field-type "text")}  "text"]
         [:> MenuItem {:on-click #(edit-field-type "image")} "image"]
-        [:> MenuItem {:on-click #(edit-field-type "audio")} "audio"]]]])}
+        [:> MenuItem {:on-click #(edit-field-type "audio")} "audio"]]]]))
+
+(defn table-field-header [field field-count]
+  (let [edit-field-name #(dispatch [:db/edit-field (assoc field :name %)])
+        edit-field-type #(dispatch [:db/edit-field (assoc field :type %)])]
+
+  [:> js/antd.Popover {:placement "bottom"
+                       :trigger   "click"
+                       :content   (r/as-element [field-header-popover field])}
 
     ;; Popover Trigger Element
     [:div {:style (styles/table-field-column field-count)}
@@ -84,22 +81,18 @@
 
     (for [datum meta-data]
       [:div {:key (datum :name)
-             :style (styles/table-field-column (+ meta-data-count (count fields)))}
+             :style (styles/table-field-column (+ meta-data-count
+                                                  (count fields)))}
 
        (datum :name)])
 
  
    ;; Add Field
 
-   [:div {:on-click #(dispatch [:db/add-field {:deck-id deck-id
+   [:div {:style styles/table-add-field
+          :on-click #(dispatch [:db/add-field {:deck-id deck-id
                                                :name "Untitled"
-                                               :type "text"}])
-          :style {:display 'flex
-                  :align-items 'center
-                  :justify-content 'center
-                  :flex-grow 1
-                  :color styles/weak-color
-                  :width 32}}
+                                               :type "text"}])}
     [icons/plus 18 18]]])
 
   ;(r/with-let [hover? (r/atom false)]
@@ -111,7 +104,7 @@
 
     [:div {:content-editable true
            :style       (styles/editing-table-cell width)
-           :on-blur     (on-blur #(-> % .-target .-textContent save))
+           :on-blur     (on-blur (with-content save))
            :on-key-down #(case (.-which %)
                            ;kbd/enter  (-> % .-target .blur)
                            kbd/escape (-> % .-target .blur)
