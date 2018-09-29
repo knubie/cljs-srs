@@ -262,39 +262,24 @@
 
 (def local-storage-key "cljs-app-transit")
 
-;(defn serialize [a]
-  ;(js/Promise. (fn [resolve reject]
-                 ;(js/console.log "starting serialization")
-                 ;(resolve (prn-str a)))))
+(def get-state-from-storage
+  storage/get-from-file)
+
+(defn set-state-to-storage [str]
+  (storage/set-to-local-storage str)
+  (storage/set-to-file str))
 
 (defn store-state [str]
   (js/Promise. (fn [resolve reject]
                  (js/console.log "starting persistence")
     (storage/store-text "db.txt" str)
-    (.setItem js/localStorage local-storage-key str)
-    )))
-
-(def write-handlers
-  {goog.date.Date (transit/write-handler
-                    (constantly "t")
-                    #(.getTime %)
-                    #(-> % .getTime str))})
-
-(def read-handlers
-  {"t" (transit/read-handler
-         #(-> % js/goog.date.UtcDateTime.fromTimestamp to-local-date))})
-
-(def writer (transit/writer :json {:handlers write-handlers}))
-(def reader (transit/reader :json {:handlers read-handlers}))
-
-(defn write-transit [data]
-  (transit/write writer data))
+    (.setItem js/localStorage local-storage-key str))))
 
 (defn state->local-storage []
   (-> (.resolve js/Promise)
-      (.then #(write-transit @state))
+      (.then #(storage/write-transit @state))
       ;(.then #(serialize @state))
-      (.then store-state)))
+      (.then set-state-to-storage)))
 
 ;(defonce myWorker (js/Worker. "js/bootstrap_worker.js"))
 
@@ -307,19 +292,23 @@
   ;(js/console.log @state)
   ;(.postMessage myWorker @state))
 
-;let serialize = new Promise((resolve, reject) => {
-  ;(resolve (prn-str @state))
-;})
+(defn local-storage->state [state-from-storage]
+  (reset! state (some->> state-from-storage
+                         storage/read-transit)))
 
-;(defn local-storage->state [local-storage-state]
-  ;(reset! state (some->> local-storage-state
-                         ;(edn/read-string {:readers {'inst to-local-date}}))))
-(defn local-storage->state [local-storage-state]
-  (reset! state (some->> local-storage-state
-                         (transit/read reader))))
+;  ;; Get state from file
+;  ;; Get new actions from other file
+;  ;; Re-play actions on state
+;  ;; Persist new state to file
+;  (let [state-from-file (read-edn "db.txt")
+;        new-actions (read-edn "actions.txt")]
+;    (local-storage->state)
+;    (run! handle new-actions)
+;    (state->local-storage)
+;    store-text updated-state "db.txt")
 
 (defn initialize-db []
-  (let [local-storage-state (.getItem js/localStorage local-storage-key)]
-    (if (nil? local-storage-state)
+  (let [state-from-storage (get-state-from-storage)]
+    (if (nil? state-from-storage)
       (seed-data)
-      (local-storage->state local-storage-state))))
+      (local-storage->state state-from-storage))))
