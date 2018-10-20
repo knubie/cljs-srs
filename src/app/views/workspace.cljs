@@ -38,11 +38,18 @@
      ;:note  [note-workspace  (nth @db/ui-workspace 1)]
      :note  [:<> [topbar/note (nth @db/ui-workspace 1)]
                  [note-workspace (nth @db/ui-workspace 1)]]
-     :edit-note [edit-note (nth @db/ui-workspace 1)]
+
+     :edit-note [:<> [topbar/editing-note (nth @db/ui-workspace 1)]
+                     [edit-note (nth @db/ui-workspace 1)]]
+
      :deck  [:<> [topbar/deck (nth @db/ui-workspace 1)]
                  [deck-workspace (nth @db/ui-workspace 1)]]
-     :edit-deck-template [edit-template (nth @db/ui-workspace 1)]
+
+     :edit-deck-template [:<> [topbar/editing-deck-template (nth @db/ui-workspace 1)] 
+                              [edit-template (nth @db/ui-workspace 1)]]
+
      :learn [:<> [topbar/deck (nth @db/ui-workspace 1)]
                  [study/learn (nth @db/ui-workspace 1)]]
+
      :review [:<> [topbar/deck (nth @db/ui-workspace 1)]
                   [study/review (nth @db/ui-workspace 1)]])])

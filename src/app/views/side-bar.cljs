@@ -36,7 +36,7 @@
   (let [decks (->> @db/all-decks (db/where :deck-id nil))]
 
     [:div {:style styles/side-bar}
-     [:div
+     [:div {:style {:overflow-y "scroll"}}
       [section {:title "Notes"}
        (for [[id note] @db/all-notes] ^{:key (note :id)}
          [side-bar-section-item {:name (note :name)
@@ -50,6 +50,7 @@
       [section {:title "Decks"}
        (for [[id deck] decks] ^{:key (deck :id)}
          [deck-item {:deck-id (:id deck)
+                     :name (:name deck)
                      :depth 1}])
 
        [side-bar-section-item {:name "Add Deck"

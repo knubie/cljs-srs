@@ -20,6 +20,7 @@
 })
 
 (def side-bar {
+  :display          "flex"
   :padding-top      "45px"
   :background-color sidebar-background
   :color            sidebar-foreground
@@ -112,12 +113,13 @@
   :flex          "0 0 auto"})
 
 (defn table-field-column [field-count] {
-  :display      'flex
-  :align-items  'center
+  :display      "flex"
+  :align-items  "center"
   ;:-webkit-user-modify 'read-write-plaintext-only
   ;:outline      0
   :padding      "0 8px"
   ;:flex-shrink  0
+  :cursor       "pointer"
   :min-height   32
   :border-right border-weak
   :width        (/ (- 900 32) field-count)
@@ -151,6 +153,7 @@
   :white-space  "nowrap"
   :overflow     "hidden"
   :padding      "5px 8px 6px"
+  :height       49
   :border-right border-weak
   :cursor       'pointer
 })
