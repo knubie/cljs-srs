@@ -38,6 +38,7 @@
                                             (if (last-side?) (remember @this-card) (next-side)))
                               kbd/left-arrow  (prev-side)
                               kbd/right-arrow (next-side)
+                              kbd/d           (delete @this-card)
                               kbd/r           (let [audio (aget (.getElementsByTagName js/document "audio") 0)]
                                                 (aset audio "currentTime" 0)
                                                 (.play audio))
