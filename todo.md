@@ -1,5 +1,16 @@
+Add deck ->
+  - New from template (select template?)
+  - Browse decks online (small link)
+
+Make cards look like actual TCG, gamify
+
+
+
+
+
+
 # Technical Debt
-- [ ] Move colors into file
+- [x] Move colors into file
 - [ ] Change add-record! signature to make record first arg, update import.cljs
 - [ ] Performance monitoring
    - When are components re-rendering
@@ -35,19 +46,11 @@
 
 # Bug
 - [ ] Audio doesn't play from table view
-- [ ] R button only plays audio from the first slide?
-- [ ] What's causing the multiple reviews?
-   - [ ] Making a card due on the same day
-   - [ ] Card was in the learning queue
-- [ ] Clicking remember on a card will show the same card again
 - [ ] Need to write some kind of timing function that updates the db so
 that queries based on the current day work.
 - [x] Shouldn't lose focus of input when switching windows.
 
 # Misc
-- [ ] Enter/Esc to finish editing field name
-- [ ] Difficult to click into audio cell to edit
-- [ ] Some button or something to click when done editting template
 - [ ] Would be nice if template auto-updated when field names chnage
 - [x] Breadcrumbs at the top
 - [x] Sort reviewed by due date
@@ -56,18 +59,10 @@ that queries based on the current day work.
 - [ ] How many forgottens are in the learning queue
 - [ ] Confirmation on delete (or trashcan)
 - [ ] Undo remember / forget
-- [ ] Add missed cards to end of review
-- [~] **Edit from study view**
 - [~] **Furigana**
   - [ ] Add option to furigana-ize selected text
 - [ ] Figure out undoing
 - [ ] **Suspend cards**
-- [x] **Top Bar with progress**
-   - [x] Cards reviewed today, cards learned today
-- [x] Stop storing UI actions in local storage
-- [ ] Keyboard controls from card view
-   - [x] R to replay
-   - [ ] D to delete
 - [ ] Backups
 - [~] Delete deck
    - [x] Delete deck
