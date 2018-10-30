@@ -13,6 +13,7 @@ body {
 /* Images should never bleed outside of their container. */
 img {
   max-width: 100%;
+  max-height: 100%;
 }
 
 #drag-region {
@@ -72,10 +73,10 @@ code {
   /*padding-right: 0.25em;*/
 }
 
-/* START Markdown Styles */
+/* END Markdown Styles */
 
 
-/* Ant Design overrides*/
+/* START Ant Design overrides*/
 
 /* Controls animation speed on modals. Reducing from 0.2s to 0.1s */
 .zoom-enter,
@@ -146,4 +147,18 @@ code {
   color: inherit;
   font-size: inherit;
   font-family: inherit;
+}
+
+.ant-popover-inner-content {
+  padding: 0;
+}
+
+.ant-menu-vertical {
+  border: none;
+}
+
+/* END Ant Design overrides*/
+
+.field:hover {
+  background-color: rgba(50, 50, 50, 0.08)
 }
