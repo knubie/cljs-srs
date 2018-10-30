@@ -50,23 +50,23 @@
                                        #(js/encodeURI (.join path save-path %)))
                             (assoc :deck-id new-deck
                                    :learning? true
-                                   :reviews [])
-                            
-                          )
-                                    )
+                                   :reviews [])))
 
-                   new-edn (update-in edn [:fields] rename-keys new-field-keys)
-                   ]
-               (doall (map (fn [[id field]]
-                (swap! db/state assoc-in [:db :fields id] (assoc field :id id :deck-id new-deck))
-                       ) (new-edn :fields))
-                 )
+                   new-edn (update-in edn [:fields] rename-keys new-field-keys)]
+
+               (doall
+                 (map (fn [[id field]]
+                        (swap! db/state
+                               assoc-in [:db :fields id] (assoc field :id id :deck-id new-deck)))
+                      (new-edn :fields)))
+
                ;; TODO: Sanitize: remove \N
                ;; remove any backslashes?
-                   (doall (map #(->> % (transform-card) (db/add-record! :cards))
-                               (new-edn :cards)))
+               (doall (map #(->> % (transform-card) (db/add-record! :cards))
+                           (new-edn :cards)))
 
-             )
-             )}
-  ]
-)
+               ;; Save the current state to disk.
+               (reset! db/all-actions [])
+               (js/setTimeout #(db/state->storage) 1)
+               (js/setTimeout #(db/actions->storage) 1)
+             ))}])
