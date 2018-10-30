@@ -11,7 +11,7 @@
                  [cljsjs/draft-js "0.10.5-0"]]
 
   :plugins [[lein-cljsbuild "1.1.7"]
-            [lein-figwheel  "0.5.16-SNAPSHOT"]]
+            [lein-figwheel  "0.5.17"]]
 
   :hooks [leiningen.cljsbuild]
 
