@@ -1,8 +1,10 @@
 (ns app.db
   (:require [cljs.spec.alpha :as s]
             [cljs.reader     :as edn]
+            ;[app.events                  :refer [dispatch]]
             [app.sample-note :as sample-note]
             [app.storage     :as storage]
+            [app.events.interface :refer [handle]]
             [reagent.core    :as r]
             [cognitect.transit :as transit]
             [cljs-time.core  :as cljs-time]
@@ -21,7 +23,7 @@
 (s/def ::name     string?)
 (s/def ::template string?)
 (s/def ::content  string?)
-(s/def ::due      inst?)
+;(s/def ::due      inst?)
 (s/def ::interval number?)
 (s/def ::remembered? boolean?)
 (s/def ::learning? boolean?)
@@ -60,16 +62,7 @@
           :fields {}
           :cards  {}}}))
 
-(def init-state
-  {:actions []
-   :ui {:workspace [:home]
-        :modal  {:card-id nil
-                 :open? false}}
-   :db {:notes  {} ;; TODO: Write spec
-        :decks  {}
-        :fields {}
-        :cards  {}}})
-
+(defonce all-actions  (r/cursor state [:actions]))
 (defonce ui-workspace (r/cursor state [:ui :workspace]))
 (defonce all-decks    (r/cursor state [:db :decks]))
 (defonce all-notes    (r/cursor state [:db :notes]))
@@ -269,17 +262,28 @@
   (storage/set-to-local-storage str)
   (storage/set-to-file str))
 
+(defn set-actions-to-storage [str]
+  (storage/set-actions-to-file str))
+
+(def get-actions-from-storage
+  storage/get-actions-from-file)
+
 (defn store-state [str]
   (js/Promise. (fn [resolve reject]
                  (js/console.log "starting persistence")
     (storage/store-text "db.txt" str)
     (.setItem js/localStorage local-storage-key str))))
 
-(defn state->local-storage []
+(defn state->storage []
   (-> (.resolve js/Promise)
       (.then #(storage/write-transit @state))
       ;(.then #(serialize @state))
       (.then set-state-to-storage)))
+
+(defn actions->storage []
+  (-> (.resolve js/Promise)
+      (.then #(storage/write-transit (:actions @state)))
+      (.then set-actions-to-storage)))
 
 ;(defonce myWorker (js/Worker. "js/bootstrap_worker.js"))
 
@@ -287,14 +291,68 @@
   ;(js/console.log "Got back from worker, saving...")
   ;(.setItem js/localStorage local-storage-key (.-data e))))
 
-;(defn state->local-storage []
+;(defn state->storage []
   ;(js/console.log "Sending to worker")
   ;(js/console.log @state)
   ;(.postMessage myWorker @state))
 
-(defn local-storage->state [state-from-storage]
+(defn storage->state
+  [state-from-storage
+   actions-from-storage]
+
   (reset! state (some->> state-from-storage
-                         storage/read-transit)))
+                         storage/read-transit))
+  (doseq [action (storage/read-transit actions-from-storage)] (handle action))
+  (reset! all-actions [])
+  (js/setTimeout #(state->storage) 1)
+  (js/setTimeout #(actions->storage) 1)
+  
+  ;(->> @all-notes
+       ;(where :id nil)
+       ;(map (fn [[id note]]
+              ;(js/console.log (clj->js note))
+              ;(js/console.log (clj->js id))
+
+          ;(swap! state update-in [:db :notes] dissoc id)
+              ;))
+       ;(doall)
+       ;)
+  ;(js/setTimeout #(state->storage) 1)
+
+  ;(->> @all-decks
+       ;(where :id nil)
+       ;(map (fn [[id deck]]
+              ;(js/console.log (clj->js deck))
+              ;(js/console.log id)
+            ;(dispatch [:db/delete-deck id])
+            ;)
+            ;)
+       ;(doall)
+       ;)
+
+
+
+  ;(->> @all-cards
+       ;(where :deck-id :d707cc50-b313-4c2b-a4bb-488986b6bfc9)
+       ;(where :due (-> (cljs-time/today) (cljs-time/plus (cljs-time/days 1))))
+       ;(vals)
+       ;(map (fn [card]
+              ;(dispatch [:db/edit-card (-> card
+;(assoc :due (cljs-time/today))
+;(assoc :reviews
+  ;[{:date (-> (cljs-time/today) (cljs-time/minus (cljs-time/days 1)))
+    ;:due (cljs-time/today)
+    ;:interval 1, :remembered? true}]
+                        ;)
+                                           ;)
+                          ;])
+        ;))
+       ;(doall)
+       ;(count)
+       ;(js/console.log)
+       ;)
+
+) ;;;;;;;;;;;;;;;;;; END ;;;;;;;;;;;;;;;;;;
 
 ;  ;; Get state from file
 ;  ;; Get new actions from other file
@@ -302,13 +360,14 @@
 ;  ;; Persist new state to file
 ;  (let [state-from-file (read-edn "db.txt")
 ;        new-actions (read-edn "actions.txt")]
-;    (local-storage->state)
+;    (storage->state)
 ;    (run! handle new-actions)
-;    (state->local-storage)
+;    (state->storage)
 ;    store-text updated-state "db.txt")
 
 (defn initialize-db []
-  (let [state-from-storage (get-state-from-storage)]
+  (let [state-from-storage (get-state-from-storage)
+        actions-from-storage (get-actions-from-storage)]
     (if (nil? state-from-storage)
       (seed-data)
-      (local-storage->state state-from-storage))))
+      (storage->state state-from-storage actions-from-storage))))

@@ -25,6 +25,10 @@
          (.writeFileSync fs save-file-path))
     save-file-path))
 
+(defn append-text [file-name text]
+  (let [save-file-path (.join path user-data file-name)]
+    (.appendFile fs save-file-path text #(js/console.log "Appended file."))))
+
 (defn store-text [file-name text]
   (let [save-file-path (.join path user-data file-name)]
     (.writeFile fs save-file-path text #(js/console.log "Saved file."))))
@@ -49,6 +53,15 @@
   (js/Promise. (fn [resolve reject]
     (js/console.log "Starting set to file.")
     (store-text "db.txt" str))))
+
+(defn get-actions-from-file []
+  (js/console.log "Starting get actions from file.")
+  (read-text "actions.txt"))
+
+(defn set-actions-to-file [str]
+  (js/Promise. (fn [resolve reject]
+    (js/console.log "Starting set to file.")
+    (store-text "actions.txt" str))))
 
 ;; -- Transit --------------------------------------------------------------
 ;;

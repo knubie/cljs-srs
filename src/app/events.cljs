@@ -1,11 +1,13 @@
 (ns app.events
   (:require [cljs.spec.alpha :as s]
             [reagent.core    :as r]
+            [app.storage     :as storage]
             [app.events.interface :refer [handle]]
             [app.events.ui]
             [app.events.db]
             [app.db :refer [state ui-workspace where
-                            add-record! state->local-storage]]
+                            actions->storage
+                            add-record! state->storage]]
             [app.models.card :as c]))
 
 ;; -- Action Dispatch ------------------------------------------------------
@@ -20,12 +22,6 @@
       (ex-info
         (str "spec check failed: "
              (s/explain-str :app.db/db (-> @state :db))) {}))))
-
-(defn save-state []
-  (js/console.log "Saving state.")
-  (state->local-storage)
-  (js/console.log "Called state->local-storage")
-  )
 
 (defn validate-action [action]
   (when-not (s/valid? :app.events/action action)
@@ -42,6 +38,11 @@
   (validate-state)
   (when-not (ui-event? action)
     (swap! state update-in [:actions] conj action)
-    ;(r/after-render #(save-state))
-    (js/setTimeout #(save-state) 1)
+    ;(storage/store-text "actions.txt" (-> @state
+                                          ;:actions
+                                          ;storage/write-transit))
+    (js/setTimeout #(actions->storage) 1)
+    ;(storage/append-text "actions.txt" (storage/write-transit action))
+    ;(r/after-render #(state->storage))
+    ;(js/setTimeout #(state->storage) 1)
     ))
