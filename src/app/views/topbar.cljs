@@ -37,7 +37,7 @@
                     " / " (count @unlearned-cards))
                #(dispatch [:ui/learn deck-id])]
 
-    [ui/button [:<> [icons/trash 14 14 5] "Delete"]
+    [ui/button [:<> [icons/trash 14 14 5] "Delete Deck"]
                #(dispatch [:db/delete-deck deck-id])]]]
   )
 )
