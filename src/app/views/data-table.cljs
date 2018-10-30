@@ -35,7 +35,7 @@
 
       ;; Edit Type
       [:> Menu {:mode "vertical"}
-       [:> SubMenu {:title "Property Type"}
+       [:> SubMenu {:title (:type field)}
         [:> MenuItem {:on-click #(edit-field-type "text")}  "text"]
         [:> MenuItem {:on-click #(edit-field-type "image")} "image"]
         [:> MenuItem {:on-click #(edit-field-type "audio")} "audio"]]]]))
@@ -90,6 +90,7 @@
    ;; Add Field
 
    [:div {:style styles/table-add-field
+          :class "field"
           :on-click #(dispatch [:db/add-field {:deck-id deck-id
                                                :name "Untitled"
                                                :type "text"}])}
@@ -143,6 +144,7 @@
                                   :field-value %}])
                                 (reset! editing? false))}]]
       [:div {:key (field :id)
+             :class "field" 
              :on-click #(reset! editing? true)
              :style (merge styles/table-cell {:width width})}
         (-> record :fields ((field :id)))])))
@@ -161,6 +163,7 @@
                                 :field-value (js/encodeURI %)}])}])}
 
     [:div {:key (field :id)
+           :class "field" 
            :style (merge styles/table-cell {:width width})}
 
        [:img {:src (-> record :fields ((field :id)))}]]])
@@ -180,6 +183,7 @@
                                 :field-value (js/encodeURI %)}])}])}
 
     [:div {:key (field :id)
+           :class "field" 
            :style (merge styles/table-cell {:width width})}
 
        [:audio {:src (-> record :fields ((field :id)))
@@ -226,7 +230,8 @@
                        :align-items  'center
                        :cursor       'default
                        :padding      "0 8px"
-                       :min-height   32
+                       :height   49
+                       ;:min-height   32
                        :width        column-width
                        :border-right styles/border-weak}}
          (-> record ((datum :fn)))])
@@ -259,7 +264,7 @@
       #(r/as-element [:> js/ReactVirtualized.List
                       {:width       710
                        :height      (.-height %)
-                       :rowHeight   58
+                       :rowHeight   49
                        :rowCount    (count records)
                        :rowRenderer row-renderer}])]]))
 
