@@ -23,10 +23,6 @@
                                            :asset-path "js"
                                            :optimizations :none
                                            :source-map true
-                                           :source-map-timestamp true}}
-                       :worker {:source-paths ["src_worker"]
-                                :figwheel true
-                                :compiler {:optimizations :none
                                            :source-map-timestamp true}}}}}
              :prod {:cljsbuild
                     {:builds
@@ -41,8 +37,4 @@
                {:client
                  {:source-paths ["src"]
                   :compiler     {:output-dir "resources/public/js"
-                                 :output-to  "resources/public/js/main.js"}}
-                :worker
-                 {:source-paths ["src_worker"]
-                  :compiler     {:output-dir "resources/public/js/worker_out"
-                                 :output-to  "resources/public/js/worker.js"}}}})
+                                 :output-to  "resources/public/js/main.js"}}}})

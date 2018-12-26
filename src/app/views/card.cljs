@@ -14,6 +14,8 @@
               (for [field deck-fields]
                 [(-> field :name keyword)
                  (-> card :fields ((:id field)))]))
+
+                       ;]))
         furigana (fn [s] (.convert js/kuroshiro (clj->js s) #js{:mode "furigana" :to "hiragana"}))
         ;convert-furigana-block  (fn [s] (str/replace s #"ffffurigana\s(.*)\sfff" furigana))
         convert-furigana-block  (fn [s] (str/replace s #"ffffurigana\s([\s\S]+)\sfff" #(-> % (get 1) furigana)))
@@ -32,8 +34,7 @@
                                      ;kuroshiro.convert(_, #js{mode: "furigana", to: "hiragana"});
                                      ))}}]]))
 
-;; TODO: Rename this?
-(defn render-card3 [card-id]
+(defn edit-card [card-id]
   (let [card        (@db/all-cards card-id)
         deck-id     (card :deck-id)
         deck        (@db/all-decks deck-id)
@@ -44,12 +45,9 @@
             [(-> field :name keyword)
              (-> card :fields ((field :id)))]))]
 
-    [:<>
-     [:div
-      (for [field @deck-fields] ^{:key (field :id)}
-        [:div {:style {:display "flex"}}
-         [:div {:style {:width 160}} (field :name)]
-         [table/table-cell field card 300]])
-      [:div {:style {:display "flex"}}
-       [:div {:style {:width 160}} "Notes"]
-       [table/table-cell {:type "notes"} card 300]]]]))
+    [:div
+     (for [field @deck-fields] ^{:key (field :id)}
+       [:div {:style {:display "flex"}}
+        [:div {:style {:width 160}}
+         (field :name)]
+        [table/table-cell field card 300]])]))

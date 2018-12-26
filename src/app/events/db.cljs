@@ -35,7 +35,7 @@
   [_]
 
   (db/add-record! :notes {:name    "New Note"
-                       :content "Edit me!"}))
+                          :content "Edit me!"}))
 
 
 (defmethod event-spec :db/trash-deck [_]

@@ -2,6 +2,8 @@
   (:require [cljs-time.format :refer [formatter unparse]]
             [cljs-time.core   :as t]))
 
+(defn tomorrow [] (-> (t/today) (t/plus (t/days 1))))
+
 ;; TODO: Test me
 (defn formatted-due [card]
   (if (nil? (card :due))
@@ -13,8 +15,6 @@
   "Not Reviewed")
 
 (def default-ease 2.0)
-
-(defn tomorrow [] (-> (t/today) (t/plus (t/days 1))))
 
 (defn at-least-tomorrow [dt]
   (if (t/after? (tomorrow) dt)

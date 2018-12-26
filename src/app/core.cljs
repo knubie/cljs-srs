@@ -4,7 +4,7 @@
             [app.dnd             :as dnd]
             [app.db              :refer [state modal initialize-db]]
             [app.events          :refer [dispatch]]
-            [app.views.card      :refer [render-card3]]
+            [app.views.card      :refer [edit-card]]
             [app.views.side-bar  :refer [side-bar]]
             [app.views.workspace :refer [workspace]]
             [app.views.ui        :as ui]
@@ -60,7 +60,8 @@
 
 ;; -- View Components ------------------------------------------------------
 ;;
-;; The main view component. Not much to see here.
+;; The main view component. It incluees a global modal component. Not much
+;; to see here.
 
 (defn app []
   [:<>
@@ -74,6 +75,7 @@
                       :footer nil
                       :closable false
                       :onCancel #(dispatch [:ui/close-modal])}
+    ;; TODO: clear card id when closing.
     (if (boolean (@modal :card-id))
       [:div
        [:div {:style {:height 45
@@ -82,14 +84,7 @@
                       :align-items 'center
                       :padding-left 12
                       :padding-righ 12}}]
-       [render-card3 (@modal :card-id)]]
-    )]])
-
-(defn with-drag-drop-context [app]
-  (-> app
-      reagent->react
-      ((js/ReactDnD.DragDropContext (.-default js/ReactDnDHTML5Backend)))
-      react->reagent))
+       [edit-card (@modal :card-id)]])]])
 
 ;; -- Entry Point ----------------------------------------------------------
 ;;

@@ -9,6 +9,11 @@ Make cards look like actual TCG, gamify
 
 
 
+- [ ] Move tooling to shadow-cljs
+- [ ] Save the db when on "new" events. e.g. new deck, new note.
+- [ ] Pass dates around explicitly in events
+- [ ] make events take and return state (so that they're testable)
+
 # Technical Debt
 - [x] Move colors into file
 - [ ] Change add-record! signature to make record first arg, update import.cljs

@@ -12,7 +12,9 @@
 (def user-data-media (.join path user-data "media"))
 
 (defn randomize-keys [the-keys]
-  (zipmap the-keys (repeatedly #(keyword (str (random-uuid))))))
+  (let [random-keys (repeatedly #(-> (random-uuid) str keyword))]
+
+  (zipmap the-keys random-keys)))
 
 (defn transform-file-path [save-path file]
   (js/encodeURI (.join path save-path file)))
@@ -28,6 +30,7 @@
                             (.readFileSync fs)
                             (.toString)
                             (edn/read-string))
+                   ;; new-field-keys (-> edn :fields keys randomize-keys)
                    new-field-keys (randomize-keys (keys (:fields edn)))
 
                    ;; TODO: Dispatch?
